@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuickManager — Multi-League Fantasy Tools for Sleeper</title>
+<meta name="description" content="Manage all your Sleeper fantasy football leagues at once: mass lineup optimizer, waiver tools, and cross-league trades.">
+<link rel="icon" type="image/png" href="icons/icon32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b1120;
+    --bg-deep: #070b16;
+    --card: #141c30;
+    --card-alt: #182140;
+    --border: #263252;
+    --text: #f4f6fb;
+    --muted: #93a1c2;
+    --muted-dim: #5c6a8c;
+    --gold: #f5b31a;
+    --gold-dim: #caa244;
+    --blue: #5b93ff;
+    --green: #34d399;
+    --red: #f87171;
+    --max: 1120px;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, .display {
+    font-family: 'Oswald', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  a { color: var(--gold); }
+
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- NAV ---------- */
+  nav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(11,17,32,0.88);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 68px; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .brand img { height: 34px; width: auto; display: block; }
+  .brand .word { font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 1.15rem; color: var(--text); text-transform: none; letter-spacing: 0; }
+  .brand .word span { color: var(--blue); }
+  .navlinks { display: flex; gap: 28px; font-size: 0.92rem; }
+  .navlinks a { color: var(--muted); text-decoration: none; font-weight: 500; }
+  .navlinks a:hover { color: var(--text); }
+  @media (max-width: 640px) { .navlinks { display: none; } }
+
+  /* ---------- HERO ---------- */
+  .hero {
+    position: relative;
+    padding: 96px 0 64px;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse 700px 420px at 78% -8%, rgba(245,179,26,0.14), transparent 60%),
+      radial-gradient(ellipse 600px 400px at 5% 10%, rgba(91,147,255,0.10), transparent 60%);
+  }
+  .bolt-streak {
+    position: absolute; top: 0; right: -6%; height: 100%; width: 46%;
+    opacity: 0.5; pointer-events: none;
+  }
+  .hero-inner { position: relative; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: center; }
+  @media (max-width: 900px) { .hero-inner { grid-template-columns: 1fr; } }
+
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold);
+    background: rgba(245,179,26,0.09); border: 1px solid rgba(245,179,26,0.28);
+    padding: 6px 12px; border-radius: 999px; margin-bottom: 22px;
+  }
+  .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 3px rgba(52,211,153,0.18); }
+
+  .hero h1 { font-size: clamp(2.4rem, 5vw, 3.6rem); line-height: 1.04; }
+  .hero h1 .accent { color: var(--gold); }
+  .hero p.lede { font-family: 'Inter', sans-serif; text-transform: none; font-size: 1.14rem; color: var(--muted); max-width: 46ch; margin-top: 22px; font-weight: 400; letter-spacing: 0; }
+
+  .cta-row { display: flex; gap: 14px; margin-top: 34px; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.95rem;
+    padding: 13px 22px; border-radius: 10px; text-decoration: none;
+    border: 1px solid transparent; transition: transform 0.12s ease, border-color 0.12s ease;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn-primary { background: var(--gold); color: #14100a; }
+  .btn-primary:hover { background: #ffc233; }
+  .btn-ghost { border-color: var(--border); color: var(--text); }
+  .btn-ghost:hover { border-color: var(--muted-dim); }
+
+  .hero-card {
+    background: linear-gradient(180deg, var(--card), var(--card-alt));
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 26px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  }
+  .hero-card .row { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--border); font-size: 0.92rem; }
+  .hero-card .row:last-child { border-bottom: none; }
+  .hero-card .row .k { color: var(--muted); font-weight: 500; }
+  .hero-card .row .v { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--text); }
+  .hero-card .v.green { color: var(--green); }
+  .hero-card .v.gold { color: var(--gold); }
+
+  /* ---------- SCOREBOARD TICKER (signature element) ---------- */
+  .ticker {
+    background: var(--bg-deep);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    position: relative;
+  }
+  .ticker::before, .ticker::after {
+    content: ""; position: absolute; top: 0; bottom: 0; width: 60px; z-index: 2;
+  }
+  .ticker::before { left: 0; background: linear-gradient(90deg, var(--bg-deep), transparent); }
+  .ticker::after { right: 0; background: linear-gradient(270deg, var(--bg-deep), transparent); }
+  .ticker-track {
+    display: flex; gap: 64px; white-space: nowrap;
+    animation: scroll-left 26s linear infinite;
+    padding: 16px 0;
+    width: max-content;
+  }
+  .ticker-item {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; font-weight: 600;
+    color: var(--muted); letter-spacing: 0.03em; display: flex; align-items: center; gap: 10px;
+  }
+  .ticker-item b { color: var(--gold); font-size: 0.9rem; }
+  .ticker-item .sep { color: var(--muted-dim); }
+  @keyframes scroll-left { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce) { .ticker-track { animation: none; } }
+
+  /* ---------- SECTIONS ---------- */
+  section { padding: 88px 0; }
+  .section-head { max-width: 640px; margin-bottom: 48px; }
+  .kicker {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--blue); margin-bottom: 14px; display: block;
+  }
+  .section-head h2 { font-size: clamp(1.7rem, 3.4vw, 2.3rem); }
+  .section-head p { font-family: 'Inter', sans-serif; text-transform: none; color: var(--muted); font-size: 1.03rem; margin-top: 14px; letter-spacing: 0; font-weight: 400; }
+
+  /* Bolt-shaped divider between sections */
+  .bolt-divider {
+    height: 46px; width: 100%;
+    background: var(--bg);
+  }
+  .bolt-divider svg { display: block; width: 100%; height: 100%; }
+
+  /* Feature cards */
+  .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  @media (max-width: 860px) { .features-grid { grid-template-columns: 1fr; } }
+  .feature-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+    padding: 28px; position: relative; overflow: hidden;
+  }
+  .feature-card .num {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 600;
+    color: var(--muted-dim); margin-bottom: 18px; display: block;
+  }
+  .feature-card h3 { font-size: 1.2rem; margin-bottom: 12px; color: var(--text); }
+  .feature-card p { font-family: 'Inter', sans-serif; text-transform: none; color: var(--muted); font-size: 0.95rem; font-weight: 400; letter-spacing: 0; margin: 0; }
+  .feature-card.gold-edge { border-top: 2px solid var(--gold); }
+  .feature-card.blue-edge { border-top: 2px solid var(--blue); }
+  .feature-card.green-edge { border-top: 2px solid var(--green); }
+
+  /* Free vs Pro */
+  .plans-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  @media (max-width: 760px) { .plans-grid { grid-template-columns: 1fr; } }
+  .plan-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 30px; }
+  .plan-card.pro { background: linear-gradient(180deg, rgba(245,179,26,0.07), var(--card) 40%); border-color: rgba(245,179,26,0.35); }
+  .plan-name { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .plan-card.pro .plan-name { color: var(--gold); }
+  .plan-price { font-family: 'Oswald', sans-serif; font-size: 2.1rem; font-weight: 600; margin-bottom: 4px; }
+  .plan-price sub { font-family: 'Inter', sans-serif; text-transform: none; font-size: 0.9rem; color: var(--muted); font-weight: 500; }
+  .plan-list { list-style: none; padding: 0; margin: 22px 0 0; display: flex; flex-direction: column; gap: 11px; }
+  .plan-list li { font-size: 0.93rem; color: var(--muted); display: flex; gap: 10px; align-items: flex-start; }
+  .plan-list li::before { content: "✓"; color: var(--green); font-weight: 700; flex-shrink: 0; }
+  .plan-card.pro .plan-list li::before { color: var(--gold); }
+
+  /* Setup steps */
+  .setup-tabs { display: flex; gap: 10px; margin-bottom: 28px; flex-wrap: wrap; }
+  .setup-tab {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 600;
+    padding: 9px 16px; border-radius: 8px; border: 1px solid var(--border); color: var(--muted);
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .setup-tab.active { color: var(--bg); background: var(--blue); border-color: var(--blue); }
+
+  .steps { counter-reset: step; display: flex; flex-direction: column; gap: 0; }
+  .step {
+    counter-increment: step; display: grid; grid-template-columns: 44px 1fr; gap: 18px;
+    padding: 20px 0; border-bottom: 1px solid var(--border);
+  }
+  .step:last-child { border-bottom: none; }
+  .step::before {
+    content: counter(step);
+    font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.95rem;
+    width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center; color: var(--blue);
+  }
+  .step h4 { font-family: 'Inter', sans-serif; text-transform: none; font-size: 1rem; font-weight: 600; letter-spacing: 0; margin: 0 0 4px; color: var(--text); }
+  .step p { margin: 0; color: var(--muted); font-size: 0.93rem; }
+  .step code { font-family: 'JetBrains Mono', monospace; background: var(--card-alt); border: 1px solid var(--border); padding: 1px 7px; border-radius: 5px; font-size: 0.85em; color: var(--gold); }
+
+  .callout {
+    background: var(--card-alt); border: 1px solid var(--border); border-left: 3px solid var(--gold);
+    border-radius: 10px; padding: 18px 20px; margin-top: 26px; font-size: 0.92rem; color: var(--muted);
+  }
+  .callout strong { color: var(--text); }
+
+  /* FAQ */
+  .faq-item { border-bottom: 1px solid var(--border); padding: 22px 0; }
+  .faq-item:first-child { padding-top: 0; }
+  .faq-item h4 { font-family: 'Inter', sans-serif; text-transform: none; font-size: 1rem; font-weight: 600; letter-spacing: 0; color: var(--text); margin: 0 0 8px; }
+  .faq-item p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+
+  /* Privacy */
+  .privacy-block { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 32px; }
+  .privacy-block h3 { font-family: 'Inter', sans-serif; text-transform: none; font-size: 1.05rem; font-weight: 600; letter-spacing: 0; color: var(--text); margin: 26px 0 10px; }
+  .privacy-block h3:first-child { margin-top: 0; }
+  .privacy-block p, .privacy-block li { color: var(--muted); font-size: 0.93rem; }
+  .privacy-block ul { padding-left: 20px; margin: 8px 0; }
+  .privacy-block .updated { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--muted-dim); text-transform: uppercase; letter-spacing: 0.06em; }
+
+  /* Footer */
+  footer { border-top: 1px solid var(--border); padding: 48px 0 36px; background: var(--bg-deep); }
+  .footer-grid { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 24px; }
+  .footer-brand { display: flex; align-items: center; gap: 10px; }
+  .footer-brand img { height: 26px; }
+  .footer-brand span { font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 1rem; text-transform: none; letter-spacing: 0; }
+  .footer-note { color: var(--muted-dim); font-size: 0.82rem; max-width: 440px; margin-top: 12px; }
+  .footer-links { display: flex; gap: 22px; flex-wrap: wrap; }
+  .footer-links a { color: var(--muted); text-decoration: none; font-size: 0.88rem; font-weight: 500; }
+  .footer-links a:hover { color: var(--text); }
+  .footer-bottom { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border); font-size: 0.8rem; color: var(--muted-dim); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+
+  ::selection { background: rgba(245,179,26,0.3); }
+  :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="#top" class="brand">
+      <img src="icons/logo_mark.png" alt="QuickManager">
+      <span class="word">Quick<span>Manager</span></span>
+    </a>
+    <div class="navlinks">
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#setup">Setup</a>
+      <a href="#faq">FAQ</a>
+      <a href="#privacy">Privacy</a>
+    </div>
+  </div>
+</nav>
+
+<div id="top" class="hero">
+  <svg class="bolt-streak" viewBox="0 0 400 700" preserveAspectRatio="xMidYMid slice">
+    <polygon points="230,0 90,340 190,340 130,700 340,300 220,300" fill="#f5b31a" opacity="0.06"/>
+    <polygon points="290,60 170,360 255,360 205,650 380,320 275,320" fill="#5b93ff" opacity="0.05"/>
+  </svg>
+  <div class="wrap hero-inner">
+    <div>
+      <div class="eyebrow"><span class="dot"></span> Live on Sleeper</div>
+      <h1>Run every Sleeper<br>league from <span class="accent">one tab.</span></h1>
+      <p class="lede">QuickManager scans all your leagues at once — optimal lineups, waiver targets, and trades — so a Sunday morning routine that used to take twelve tabs takes one click.</p>
+      <div class="cta-row">
+        <a href="#setup" class="btn btn-primary">Get started →</a>
+        <a href="#features" class="btn btn-ghost">See what it does</a>
+      </div>
+    </div>
+    <div class="hero-card">
+      <div class="row"><span class="k">Leagues managed at once</span><span class="v gold">Unlimited*</span></div>
+      <div class="row"><span class="k">Setup required</span><span class="v">None</span></div>
+      <div class="row"><span class="k">Your Sleeper token leaves your device</span><span class="v green">Never</span></div>
+      <div class="row"><span class="k">Free trial</span><span class="v">7 days, all leagues</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <span class="ticker-item"><b>LINEUP OPTIMIZER</b> <span class="sep">·</span> scans every league</span>
+    <span class="ticker-item"><b>WAIVER RADAR</b> <span class="sep">·</span> targets across leagues</span>
+    <span class="ticker-item"><b>TRADE FACTORY</b> <span class="sep">·</span> propose &amp; review in bulk</span>
+    <span class="ticker-item"><b>1 CLICK</b> <span class="sep">·</span> applies to every roster</span>
+    <span class="ticker-item"><b>PRIVATE BY DESIGN</b> <span class="sep">·</span> no server, no data collection</span>
+    <span class="ticker-item"><b>LINEUP OPTIMIZER</b> <span class="sep">·</span> scans every league</span>
+    <span class="ticker-item"><b>WAIVER RADAR</b> <span class="sep">·</span> targets across leagues</span>
+    <span class="ticker-item"><b>TRADE FACTORY</b> <span class="sep">·</span> propose &amp; review in bulk</span>
+    <span class="ticker-item"><b>1 CLICK</b> <span class="sep">·</span> applies to every roster</span>
+    <span class="ticker-item"><b>PRIVATE BY DESIGN</b> <span class="sep">·</span> no server, no data collection</span>
+  </div>
+</div>
+
+<section id="features">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="kicker">What it does</span>
+      <h2>Three tools. Every league.</h2>
+      <p>Managing one Sleeper league is easy. Managing ten is a chore. QuickManager turns hours of repetitive, league-by-league clicking into a few clicks that run everywhere you play.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card gold-edge">
+        <span class="num">01 — OPTIMIZER</span>
+        <h3>Mass Lineup Optimizer</h3>
+        <p>Scan every league at once and see exactly how many points you're leaving on the bench. Pick a week, review the swaps, apply optimal lineups everywhere with one click. Bye weeks and projections are handled automatically.</p>
+      </div>
+      <div class="feature-card blue-edge">
+        <span class="num">02 — WAIVERS</span>
+        <h3>Waiver Wire Tools</h3>
+        <p>Target any player and instantly see which leagues they're available in. Set FAAB bids and drops, then submit across leagues together. The Free Agent Radar surfaces the best unowned players by position, across your whole portfolio.</p>
+      </div>
+      <div class="feature-card green-edge">
+        <span class="num">03 — TRADES</span>
+        <h3>Trade Factory</h3>
+        <p>Define a trade and scan every league for valid partners. Review every pending offer across all your leagues in one place — accept, decline, or withdraw without hunting league by league.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="bolt-divider">
+  <svg viewBox="0 0 1200 46" preserveAspectRatio="none"><path d="M0,46 L500,46 L540,6 L580,46 L1200,46 L1200,0 L0,0 Z" fill="#070b16"/></svg>
+</div>
+
+<section id="pricing" style="background:var(--bg-deep);">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="kicker">Free vs Pro</span>
+      <h2>Try the whole thing first.</h2>
+      <p>Every feature works on the free plan — you just see the results on one league at a time. Upgrade when you're ready to run it everywhere.</p>
+    </div>
+    <div class="plans-grid">
+      <div class="plan-card">
+        <div class="plan-name">Free</div>
+        <div class="plan-price">$0</div>
+        <ul class="plan-list">
+          <li>Every feature, fully working</li>
+          <li>Applies to 1 league at a time</li>
+          <li>Unlimited scans and previews</li>
+          <li>No credit card required</li>
+        </ul>
+      </div>
+      <div class="plan-card pro">
+        <div class="plan-name">Pro</div>
+        <div class="plan-price">$25<sub>&nbsp;/ year</sub></div>
+        <ul class="plan-list">
+          <li>Everything in Free</li>
+          <li>Applies to every league at once</li>
+          <li>7-day free trial, no card needed to start</li>
+          <li>Cancel anytime from the extension</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="bolt-divider" style="background:var(--bg-deep);">
+  <svg viewBox="0 0 1200 46" preserveAspectRatio="none"><path d="M0,0 L500,0 L540,40 L580,0 L1200,0 L1200,46 L0,46 Z" fill="#0b1120"/></svg>
+</div>
+
+<section id="setup">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="kicker">Setup</span>
+      <h2>Two minutes, then it runs itself.</h2>
+      <p>QuickManager connects to your existing Sleeper session — there's no account to create and no password to give us.</p>
+    </div>
+
+    <h3 style="font-family:'Inter',sans-serif; text-transform:none; font-weight:600; font-size:1.05rem; letter-spacing:0; margin-bottom:6px;">Desktop — Chrome, Edge, Brave</h3>
+    <div class="steps">
+      <div class="step">
+        <div><h4>Install the extension</h4><p>Add QuickManager from the Chrome Web Store.</p></div>
+      </div>
+      <div class="step">
+        <div><h4>Log into Sleeper</h4><p>Open sleeper.com in any tab and sign in as usual.</p></div>
+      </div>
+      <div class="step">
+        <div><h4>Open QuickManager</h4><p>Click the toolbar icon. It connects automatically and pulls in your leagues.</p></div>
+      </div>
+    </div>
+
+    <h3 style="font-family:'Inter',sans-serif; text-transform:none; font-weight:600; font-size:1.05rem; letter-spacing:0; margin:40px 0 6px;">iPhone &amp; iPad — via Orion</h3>
+    <p style="color:var(--muted); font-size:0.93rem; margin-bottom:20px;">Chrome extensions on iOS run only inside the <a href="https://kagi.com/orion/" target="_blank" rel="noopener">Orion browser</a> (free, by Kagi) — not Safari.</p>
+    <div class="steps">
+      <div class="step">
+        <div><h4>Install Orion, then QuickManager inside it</h4><p>Orion supports Chrome extensions natively.</p></div>
+      </div>
+      <div class="step">
+        <div><h4>Open sleeper.com in Orion and log in</h4><p>Then turn on <code>Request Desktop Website</code> from the page-settings menu — this is what makes Sleeper generate your login token.</p></div>
+      </div>
+      <div class="step">
+        <div><h4>Let the page fully reload</h4><p>A floating button appears on the Sleeper page and turns blue once your token is captured.</p></div>
+      </div>
+    </div>
+    <div class="callout"><strong>Stuck on mobile?</strong> Tap the floating "Copy Token" button on the Sleeper page, then paste it into QuickManager's "Paste Bearer Token" box. This works even if auto-connect doesn't.</div>
+  </div>
+</section>
+
+<div class="bolt-divider">
+  <svg viewBox="0 0 1200 46" preserveAspectRatio="none"><path d="M0,46 L500,46 L540,6 L580,46 L1200,46 L1200,0 L0,0 Z" fill="#070b16"/></svg>
+</div>
+
+<section id="faq" style="background:var(--bg-deep);">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="kicker">FAQ</span>
+      <h2>Good questions.</h2>
+    </div>
+    <div style="max-width:720px;">
+      <div class="faq-item">
+        <h4>Is my Sleeper login safe?</h4>
+        <p>Yes. Your login token is read locally and stored only in your browser — it never leaves your device, and QuickManager has no server that could see it.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Why isn't my lineup change showing up?</h4>
+        <p>Click "Refresh Rosters," then re-run the optimizer. Lineups are set per week, so double-check the Target Week matches the week you edited.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Do you support IDP leagues?</h4>
+        <p>The engine is IDP-ready and will turn on automatically for defensive players once Sleeper publishes IDP projections — it currently doesn't, so rankings for those positions aren't available yet.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Is this affiliated with Sleeper?</h4>
+        <p>No. QuickManager is an independent tool built to work with your existing Sleeper account. It isn't affiliated with, endorsed by, or sponsored by Sleeper.</p>
+      </div>
+      <div class="faq-item">
+        <h4>How do I cancel Pro?</h4>
+        <p>Open QuickManager and use the account management link next to your Pro badge — payments are handled by ExtensionPay and Stripe, and you're never charged without a clear renewal notice beforehand.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="bolt-divider" style="background:var(--bg-deep);">
+  <svg viewBox="0 0 1200 46" preserveAspectRatio="none"><path d="M0,0 L500,0 L540,40 L580,0 L1200,0 L1200,46 L0,46 Z" fill="#0b1120"/></svg>
+</div>
+
+<section id="privacy">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="kicker">Privacy Policy</span>
+      <h2>What we do (and don't) collect.</h2>
+    </div>
+    <div class="privacy-block">
+      <p class="updated">Last updated: July 2026</p>
+      <p>QuickManager ("the extension") is a browser extension that helps you manage your Sleeper fantasy football leagues.</p>
+
+      <h3>Data we access</h3>
+      <ul>
+        <li><strong style="color:var(--text)">Your Sleeper authentication token</strong> — read from your browser so the extension can act within your own logged-in Sleeper session. It is stored only on your device and never transmitted to us or any third party.</li>
+        <li><strong style="color:var(--text)">Your Sleeper league, roster, and player data</strong> — read directly from Sleeper's servers by your browser, used only to display and act on your leagues. It is not collected or stored off-device.</li>
+        <li><strong style="color:var(--text)">Preferences and a cached player list</strong> — stored locally on your device so the extension runs quickly.</li>
+      </ul>
+
+      <h3>Data we do not collect</h3>
+      <p>We do not operate a server that receives your data. We do not collect, sell, or share your personal information, browsing history, or Sleeper credentials.</p>
+
+      <h3>Payments</h3>
+      <p>Optional Pro upgrades are processed by <a href="https://extensionpay.com" target="_blank" rel="noopener">ExtensionPay</a> using Stripe. Your email and payment details are handled by ExtensionPay and Stripe under their own privacy policies. The extension only checks whether your account has an active pass.</p>
+
+      <h3>Third parties</h3>
+      <p>The extension communicates only with Sleeper (sleeper.com, api.sleeper.app) and, for payment status, ExtensionPay (extensionpay.com).</p>
+
+      <h3>Affiliation</h3>
+      <p>QuickManager is an independent product and is not affiliated with, endorsed by, or sponsored by Sleeper.</p>
+
+      <h3>Contact</h3>
+      <p>Questions about this policy or your data: <a href="mailto:quickmanagerfantasy@gmail.com">quickmanagerfantasy@gmail.com</a></p>
+
+      <h3>Changes</h3>
+      <p>We may update this policy from time to time. Material changes will be reflected on this page.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">
+          <img src="icons/logo_mark.png" alt="QuickManager">
+          <span>QuickManager</span>
+        </div>
+        <p class="footer-note">Independent tool for Sleeper fantasy football. Not affiliated with, endorsed by, or sponsored by Sleeper.</p>
+      </div>
+      <div class="footer-links">
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#setup">Setup</a>
+        <a href="#faq">FAQ</a>
+        <a href="#privacy">Privacy</a>
+        <a href="mailto:quickmanagerfantasy@gmail.com">Contact</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 QuickManager</span>
+      <span>quickmanagerfantasy@gmail.com</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
