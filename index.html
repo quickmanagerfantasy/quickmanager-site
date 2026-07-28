@@ -397,12 +397,13 @@
       <p>QuickManager connects to your existing Sleeper session — there's no account to create and no password to give us.</p>
     </div>
 
-    <h3 style="font-family:'Inter',sans-serif; text-transform:none; font-weight:600; font-size:1.05rem; letter-spacing:0; margin-bottom:6px;">Desktop — Chrome, Firefox, Edge, Brave</h3>
+    <h3 style="font-family:'Inter',sans-serif; text-transform:none; font-weight:600; font-size:1.05rem; letter-spacing:0; margin-bottom:6px;">Desktop — Chrome, Edge, Brave <span style="color:var(--muted); font-weight:400; text-transform:none; font-size:0.85rem;">(Firefox coming soon)</span></h3>
     <div class="steps">
       <div class="step">
-        <!-- TODO: once both store listings are approved and live, wrap "Chrome Web Store"
-             and "Firefox Add-ons" below in <a href="..."> tags pointing to the real listing URLs. -->
-        <div><h4>Install the extension</h4><p>Add QuickManager from the Chrome Web Store (Chrome, Edge, Brave) or Firefox Add-ons (Firefox).</p></div>
+        <!-- TODO: once the Firefox Add-ons listing is approved and live, remove the
+             "(coming soon)" qualifier below and wrap "Firefox Add-ons" in an
+             <a href="..."> tag pointing to its URL. -->
+        <div><h4>Install the extension</h4><p>Add QuickManager from the <a href="https://chromewebstore.google.com/detail/quickmanager-fantasy-for/maocponhaeapmbgcjdpofjgfabogjibi" target="_blank" rel="noopener">Chrome Web Store</a> (Chrome, Edge, Brave). A Firefox Add-ons version is coming soon.</p></div>
       </div>
       <div class="step">
         <div><h4>Log into Sleeper</h4><p>Open sleeper.com in any tab and sign in as usual.</p></div>
@@ -425,7 +426,21 @@
         <div><h4>Let the page fully reload</h4><p>A floating button appears on the Sleeper page and turns blue once your token is captured.</p></div>
       </div>
     </div>
-    <div class="callout"><strong>Stuck on mobile?</strong> Tap the floating "Copy Token" button on the Sleeper page, then paste it into QuickManager's "Paste Bearer Token" box. This works even if auto-connect doesn't.</div>
+
+    <h3 style="font-family:'Inter',sans-serif; text-transform:none; font-weight:600; font-size:1.05rem; letter-spacing:0; margin:40px 0 6px;">Android — via a Chrome-extension-capable browser</h3>
+    <p style="color:var(--muted); font-size:0.93rem; margin-bottom:20px;">Most Android browsers don't support extensions, but a few Chromium-based ones do. Look for one that explicitly advertises Chrome extension or Chrome Web Store support.</p>
+    <div class="steps">
+      <div class="step">
+        <div><h4>Install a browser that supports Chrome extensions, then QuickManager inside it</h4><p>Search your device's app store for a Chromium-based browser that lists Chrome extension support — most give you direct access to the Chrome Web Store to install QuickManager the same way you would on desktop.</p></div>
+      </div>
+      <div class="step">
+        <div><h4>Open sleeper.com in that browser and log in</h4><p>Sign in as usual. If your token isn't captured automatically, check for a "Request Desktop Site" option in the browser's page menu — turning it on helps Sleeper generate the token correctly.</p></div>
+      </div>
+      <div class="step">
+        <div><h4>Open QuickManager from the toolbar</h4><p>It should connect automatically once your token is captured.</p></div>
+      </div>
+    </div>
+    <div class="callout"><strong>Stuck on mobile?</strong> Tap the floating "Copy Token" button on the Sleeper page, then paste it into QuickManager's "Paste Bearer Token" box. This works even if auto-connect doesn't, on both iOS and Android.</div>
   </div>
 </section>
 
