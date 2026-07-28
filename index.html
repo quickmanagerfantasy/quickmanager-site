@@ -257,6 +257,29 @@
   .footer-links a:hover { color: var(--text); }
   .footer-bottom { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border); font-size: 0.8rem; color: var(--muted-dim); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
 
+  /* What's New / Coming Soon */
+  .soon-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--blue);
+    background: rgba(91,147,255,0.09); border: 1px solid rgba(91,147,255,0.28);
+    padding: 6px 12px; border-radius: 999px; margin-bottom: 22px;
+  }
+  .soon-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--blue); box-shadow: 0 0 0 3px rgba(91,147,255,0.18); }
+  .whats-new-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  @media (max-width: 860px) { .whats-new-grid { grid-template-columns: 1fr; } }
+  .whatsnew-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+    padding: 26px; position: relative;
+  }
+  .whatsnew-card .tag {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue);
+    margin-bottom: 14px; display: block;
+  }
+  .whatsnew-card h3 { font-size: 1.08rem; margin-bottom: 10px; color: var(--text); }
+  .whatsnew-card p { font-family: 'Inter', sans-serif; text-transform: none; color: var(--muted); font-size: 0.92rem; font-weight: 400; letter-spacing: 0; margin: 0; }
+
   ::selection { background: rgba(245,179,26,0.3); }
   :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 </style>
@@ -271,6 +294,7 @@
     </a>
     <div class="navlinks">
       <a href="#features">Features</a>
+      <a href="#whats-new">What's New</a>
       <a href="#pricing">Pricing</a>
       <a href="#setup">Setup</a>
       <a href="#faq">FAQ</a>
@@ -352,6 +376,48 @@
 <div class="bolt-divider">
   <svg viewBox="0 0 1200 46" preserveAspectRatio="none"><path d="M0,46 L500,46 L540,6 L580,46 L1200,46 L1200,0 L0,0 Z" fill="#070b16"/></svg>
 </div>
+
+<section id="whats-new" style="background:var(--bg-deep);">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="soon-badge"><span class="dot"></span> Coming in v1.4.5</span>
+      <h2>Smarter roster moves, built from real Sleeper behavior.</h2>
+      <p>Here's what's coming in the next update.</p>
+    </div>
+    <div class="whats-new-grid">
+      <div class="whatsnew-card">
+        <span class="tag">Roster Editor</span>
+        <h3>Smarter IR &amp; Taxi Management</h3>
+        <p>Your bench is now grouped the same way Sleeper shows it — QB, RB, WR, TE, and so on — with a Taxi Squad section at the bottom. Any player who's actually eligible for IR or Taxi under your specific league's own settings gets a clear tag and a one-click move. No more guessing, and no more offering a move that Sleeper would just reject.</p>
+      </div>
+      <div class="whatsnew-card">
+        <span class="tag">My Leagues</span>
+        <h3>Move Everyone Eligible to IR — Every League, One Click</h3>
+        <p>A new button at the top of My Leagues scans every league you manage for bench players who qualify for IR right now, shows you exactly who it wants to move before doing anything, and clears the space in one pass instead of hunting league by league.</p>
+      </div>
+      <div class="whatsnew-card">
+        <span class="tag">Waiver Wire</span>
+        <h3>Never Lose a Claim to a Full Roster</h3>
+        <p>Before a waiver claim goes out, QuickManager now checks whether your roster actually has room for it. If it doesn't, it offers to open a spot first — instead of you finding out the claim failed after the fact.</p>
+      </div>
+      <div class="whatsnew-card">
+        <span class="tag">Pending Waivers</span>
+        <h3>Already-Submitted Claims Get Watched Too</h3>
+        <p>If something changes your roster after you've submitted a claim — say, you moved a player off IR — QuickManager flags any pending claim that would now fail and offers to fix it, instead of letting it quietly die when Sleeper processes waivers.</p>
+      </div>
+      <div class="whatsnew-card">
+        <span class="tag">Pending Waivers</span>
+        <h3>Drag-and-Drop Waiver Priority</h3>
+        <p>Reorder your own competing claims in a league the same way you would in Sleeper's own app — drag one above another. QuickManager keeps your priority order and FAAB bids consistent with each other automatically, so you can't accidentally rank a smaller bid ahead of a bigger one.</p>
+      </div>
+      <div class="whatsnew-card">
+        <span class="tag">Waiver Wire</span>
+        <h3>Built for Every Waiver Type</h3>
+        <p>Whether your league runs FAAB, rolling priority, or reverse standings waivers, QuickManager now submits the right kind of claim for that league automatically — no more one-size-fits-all bidding UI on leagues that don't use FAAB at all.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
 <section id="pricing" style="background:var(--bg-deep);">
   <div class="wrap">
