@@ -372,7 +372,7 @@
       </div>
     </div>
     <div style="text-align:center; margin-top:38px;">
-      <a href="features.html" class="btn btn-ghost">See all 36 features →</a>
+      <a href="features.html" class="btn btn-ghost">See all 37 features →</a>
     </div>
   </div>
 </section>
@@ -550,7 +550,7 @@
       </div>
       <div class="faq-item">
         <h4>Do you support IDP leagues?</h4>
-        <p>The engine is IDP-ready and will turn on automatically for defensive players once Sleeper publishes IDP projections — it currently doesn't, so rankings for those positions aren't available yet.</p>
+        <p>Yes. Defensive players (DL, LB, DB) are ranked and optimized just like everyone else, using Sleeper's IDP projections and your league's own IDP scoring settings.</p>
       </div>
       <div class="faq-item">
         <h4>Is this affiliated with Sleeper?</h4>
@@ -575,13 +575,20 @@
       <h2>What we do (and don't) collect.</h2>
     </div>
     <div class="privacy-block">
-      <p class="updated">Last updated: July 2026</p>
+      <p class="updated">Last updated: August 2026</p>
       <p>QuickManager ("the extension") is a browser extension that helps you manage your Sleeper fantasy football leagues.</p>
 
       <h3>Data we access</h3>
       <ul>
         <li><strong style="color:var(--text)">Your Sleeper authentication token and account ID</strong> — read from your browser so the extension can act within your own logged-in Sleeper session, and so it can confirm the username you enter matches the account you're signed in as. Both are stored only on your device and never transmitted to us or any third party.</li>
-        <li><strong style="color:var(--text)">Your Sleeper league, roster, and player data</strong> — read directly from Sleeper's servers by your browser, used only to display and act on your leagues. It is not collected or stored off-device.</li>
+        <li><strong style="color:var(--text)">Your Sleeper league, roster, and player data</strong> — read directly from Sleeper's servers by your browser, used only to display and act on your leagues. It is not collected or stored off-device.
+
+          <div style="margin-top:14px; padding-left:0;">
+            <p style="margin:0 0 8px; font-weight:600; color:var(--text);">What "acting on your leagues" means</p>
+            <p style="margin:0 0 10px;">When you use a feature that changes something, the extension sends that specific request to Sleeper using your own logged-in session — the same as if you'd clicked the button on Sleeper's own site or app. This includes setting lineups, submitting or editing waiver claims, proposing, countering, or modifying trades, moving players to or from IR or the taxi squad, and dropping players. Nothing happens automatically or in the background — every action is one you initiated.</p>
+            <p style="margin:0;"><strong style="color:var(--text);">Sending a message on your behalf.</strong> When you propose or counter a trade, you can optionally check a box to also send the other manager a Sleeper direct message with the trade attached. This only happens if you check that box for that specific trade — it's never sent automatically, and the extension doesn't read, store, or otherwise access your Sleeper messages beyond delivering that one message.</p>
+          </div>
+        </li>
         <li><strong style="color:var(--text)">Preferences and a cached player list</strong> — stored locally on your device so the extension runs quickly.</li>
       </ul>
 
