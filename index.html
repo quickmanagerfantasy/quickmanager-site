@@ -98,6 +98,14 @@
   .hero p.lede { font-family: 'Inter', sans-serif; text-transform: none; font-size: 1.14rem; color: var(--muted); max-width: 46ch; margin-top: 22px; font-weight: 400; letter-spacing: 0; }
 
   .cta-row { display: flex; gap: 14px; margin-top: 34px; flex-wrap: wrap; }
+  /* Official store badges. Per each store's own branding guidelines: never the
+     primary element on the page (sits below the real CTA buttons, at native
+     size, unmodified), and kept a clear gap both from the CTA row above and
+     from the QuickManager logo elsewhere on the page. */
+  .store-badges { display: flex; align-items: center; gap: 20px; margin-top: 28px; flex-wrap: wrap; }
+  .store-badges img { display: block; height: 46px; width: auto; }
+  .store-badges a { opacity: 0.92; transition: opacity 0.15s ease; }
+  .store-badges a:hover { opacity: 1; }
   .btn {
     display: inline-flex; align-items: center; gap: 8px;
     font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.95rem;
@@ -311,12 +319,20 @@
   </svg>
   <div class="wrap hero-inner">
     <div>
-      <div class="eyebrow"><span class="dot"></span> Live on Sleeper</div>
+      <div class="eyebrow"><span class="dot"></span> Live on Chrome &amp; Firefox</div>
       <h1>Run every Sleeper<br>league from <span class="accent">one tab.</span></h1>
       <p class="lede">QuickManager scans all your leagues at once — optimal lineups, waiver targets, and trades — so a Sunday morning routine that used to take twelve tabs takes one click.</p>
       <div class="cta-row">
         <a href="#setup" class="btn btn-primary">Get started →</a>
         <a href="#features" class="btn btn-ghost">See what it does</a>
+      </div>
+      <div class="store-badges">
+        <a href="https://chromewebstore.google.com/detail/quickmanager-fantasy-for/maocponhaeapmbgcjdpofjgfabogjibi" target="_blank" rel="noopener" aria-label="Available in the Chrome Web Store">
+          <img src="https://developer.chrome.com/static/docs/webstore/branding/image/206x58-chrome-web-bcb82d15b2486.png" alt="Available in the Chrome Web Store" height="58">
+        </a>
+        <a href="https://addons.mozilla.org/en-US/firefox/addon/quickmanager-for-sleeper/" target="_blank" rel="noopener" aria-label="Get the Add-on for Firefox">
+          <img src="https://blog.mozilla.org/addons/files/2020/04/get-the-addon-fx-apr-2020.svg" alt="Get the Add-on for Firefox" height="58">
+        </a>
       </div>
     </div>
     <div class="hero-card">
@@ -482,13 +498,10 @@
       <p>QuickManager connects to your existing Sleeper session — there's no account to create and no password to give us.</p>
     </div>
 
-    <h3 style="font-family:'Inter',sans-serif; text-transform:none; font-weight:600; font-size:1.05rem; letter-spacing:0; margin-bottom:6px;">Desktop — Chrome, Edge, Brave <span style="color:var(--muted); font-weight:400; text-transform:none; font-size:0.85rem;">(Firefox coming soon)</span></h3>
+    <h3 style="font-family:'Inter',sans-serif; text-transform:none; font-weight:600; font-size:1.05rem; letter-spacing:0; margin-bottom:6px;">Desktop — Chrome, Edge, Brave, and Firefox</h3>
     <div class="steps">
       <div class="step">
-        <!-- TODO: once the Firefox Add-ons listing is approved and live, remove the
-             "(coming soon)" qualifier below and wrap "Firefox Add-ons" in an
-             <a href="..."> tag pointing to its URL. -->
-        <div><h4>Install the extension</h4><p>Add QuickManager from the <a href="https://chromewebstore.google.com/detail/quickmanager-fantasy-for/maocponhaeapmbgcjdpofjgfabogjibi" target="_blank" rel="noopener">Chrome Web Store</a> (Chrome, Edge, Brave). A Firefox Add-ons version is coming soon.</p></div>
+        <div><h4>Install the extension</h4><p>Add QuickManager from the <a href="https://chromewebstore.google.com/detail/quickmanager-fantasy-for/maocponhaeapmbgcjdpofjgfabogjibi" target="_blank" rel="noopener">Chrome Web Store</a> (Chrome, Edge, Brave) or <a href="https://addons.mozilla.org/en-US/firefox/addon/quickmanager-for-sleeper/" target="_blank" rel="noopener">Firefox Add-ons</a> (desktop and Android).</p></div>
       </div>
       <div class="step">
         <div><h4>Log into Sleeper</h4><p>Open sleeper.com in any tab and sign in as usual.</p></div>
