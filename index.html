@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>QuickManager — Multi-League Fantasy Tools for Sleeper</title>
-<meta name="description" content="Manage all your Sleeper fantasy football leagues at once: mass lineup optimizer, waiver tools, and cross-league trades.">
+<meta name="description" content="Manage all your Sleeper fantasy football leagues at once: mass lineup optimizer, season simulation and power rankings, waiver tools, and cross-league trades.">
 <link rel="icon" type="image/png" href="icons/icon32.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -178,7 +178,7 @@
   .bolt-divider svg { display: block; width: 100%; height: 100%; }
 
   /* Feature cards */
-  .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .features-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; }
   @media (max-width: 860px) { .features-grid { grid-template-columns: 1fr; } }
   .feature-card {
     background: var(--card); border: 1px solid var(--border); border-radius: 14px;
@@ -288,6 +288,32 @@
   .whatsnew-card h3 { font-size: 1.08rem; margin-bottom: 10px; color: var(--text); }
   .whatsnew-card p { font-family: 'Inter', sans-serif; text-transform: none; color: var(--muted); font-size: 0.92rem; font-weight: 400; letter-spacing: 0; margin: 0; }
 
+  /* ---------- PRODUCT SCREENSHOTS ---------- */
+  .shot-frame {
+    background: linear-gradient(180deg, var(--card), var(--card-alt));
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 10px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  }
+  .shot-frame img { display: block; width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--border); }
+
+  .tour-row {
+    display: flex; align-items: center; gap: 52px;
+    padding: 52px 0; border-bottom: 1px solid var(--border); flex-wrap: wrap;
+  }
+  .tour-row:last-child { border-bottom: none; }
+  .tour-row.reverse { flex-direction: row-reverse; }
+  .tour-text { flex: 1 1 360px; }
+  .tour-shot { flex: 1 1 440px; min-width: 0; }
+  .tour-text .kicker { margin-bottom: 12px; }
+  .tour-text h3 { font-size: 1.35rem; margin-bottom: 12px; color: var(--text); }
+  .tour-text p { font-family: 'Inter', sans-serif; text-transform: none; letter-spacing: 0; color: var(--muted); font-size: 0.98rem; font-weight: 400; margin: 0 0 16px; }
+  .tour-points { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 9px; }
+  .tour-points li { font-size: 0.9rem; color: var(--muted); display: flex; gap: 9px; align-items: flex-start; }
+  .tour-points li::before { content: "✓"; color: var(--green); font-weight: 700; flex-shrink: 0; }
+  @media (max-width: 800px) { .tour-row, .tour-row.reverse { flex-direction: column; } }
+
   ::selection { background: rgba(245,179,26,0.3); }
   :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 </style>
@@ -302,6 +328,7 @@
     </a>
     <div class="navlinks">
       <a href="#features">Features</a>
+      <a href="#tour">Screenshots</a>
       <a href="features.html">All features</a>
       <a href="#whats-new">What's New</a>
       <a href="#pricing">Pricing</a>
@@ -348,16 +375,20 @@
   <div class="ticker-track">
     <span class="ticker-item"><b>LINEUP OPTIMIZER</b> <span class="sep">·</span> scans every league</span>
     <span class="ticker-item"><b>LATE-GAME FLEX</b> <span class="sep">·</span> pivot after early games finish</span>
+    <span class="ticker-item"><b>POWER RANKINGS</b> <span class="sep">·</span> simulate every season at once</span>
     <span class="ticker-item"><b>WAIVER RADAR</b> <span class="sep">·</span> targets across leagues</span>
     <span class="ticker-item"><b>PENDING WAIVERS</b> <span class="sep">·</span> cancel across leagues in one click</span>
     <span class="ticker-item"><b>TRADE FACTORY</b> <span class="sep">·</span> propose &amp; review in bulk</span>
+    <span class="ticker-item"><b>PLAYER PORTFOLIO</b> <span class="sep">·</span> every league's exposure at once</span>
     <span class="ticker-item"><b>1 CLICK</b> <span class="sep">·</span> applies to every roster</span>
     <span class="ticker-item"><b>PRIVATE BY DESIGN</b> <span class="sep">·</span> no server, no data collection</span>
     <span class="ticker-item"><b>LINEUP OPTIMIZER</b> <span class="sep">·</span> scans every league</span>
     <span class="ticker-item"><b>LATE-GAME FLEX</b> <span class="sep">·</span> pivot after early games finish</span>
+    <span class="ticker-item"><b>POWER RANKINGS</b> <span class="sep">·</span> simulate every season at once</span>
     <span class="ticker-item"><b>WAIVER RADAR</b> <span class="sep">·</span> targets across leagues</span>
     <span class="ticker-item"><b>PENDING WAIVERS</b> <span class="sep">·</span> cancel across leagues in one click</span>
     <span class="ticker-item"><b>TRADE FACTORY</b> <span class="sep">·</span> propose &amp; review in bulk</span>
+    <span class="ticker-item"><b>PLAYER PORTFOLIO</b> <span class="sep">·</span> every league's exposure at once</span>
     <span class="ticker-item"><b>1 CLICK</b> <span class="sep">·</span> applies to every roster</span>
     <span class="ticker-item"><b>PRIVATE BY DESIGN</b> <span class="sep">·</span> no server, no data collection</span>
   </div>
@@ -367,7 +398,7 @@
   <div class="wrap">
     <div class="section-head">
       <span class="kicker">What it does</span>
-      <h2>Three tools. Every league.</h2>
+      <h2>Four tools. Every league.</h2>
       <p>Managing one Sleeper league is easy. Managing ten is a chore. QuickManager turns hours of repetitive, league-by-league clicking into a few clicks that run everywhere you play.</p>
     </div>
     <div class="features-grid">
@@ -386,9 +417,14 @@
         <h3>Trade Factory</h3>
         <p>Define a trade and scan every league for valid partners. Review every pending offer across all your leagues in one place — accept, decline, counter, or withdraw without hunting league by league.</p>
       </div>
+      <div class="feature-card gold-edge">
+        <span class="num">04 — MATCHUPS &amp; POWER RANKINGS</span>
+        <h3>Season Simulation, League by League</h3>
+        <p>See this week's matchup and win probability everywhere at once, then simulate the rest of the season thousands of times for real playoff odds, a positional breakdown against the league, and a full player-exposure view across every roster you own.</p>
+      </div>
     </div>
     <div style="text-align:center; margin-top:38px;">
-      <a href="features.html" class="btn btn-ghost">See all 39 features →</a>
+      <a href="features.html" class="btn btn-ghost">See everything it does →</a>
     </div>
   </div>
 </section>
@@ -397,43 +433,133 @@
   <svg viewBox="0 0 1200 46" preserveAspectRatio="none"><path d="M0,46 L500,46 L540,6 L580,46 L1200,46 L1200,0 L0,0 Z" fill="#070b16"/></svg>
 </div>
 
+<section id="tour" style="background:var(--bg-deep);">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="kicker">See it running</span>
+      <h2>The actual product. No mockups.</h2>
+      <p>Every screenshot below is a real run against real leagues — nothing staged for the page.</p>
+    </div>
+
+    <div class="tour-row">
+      <div class="tour-text">
+        <span class="kicker">Lineup Optimizer</span>
+        <h3>Applies changes you can actually trust</h3>
+        <p>Each swap shows the real points gained or lost — never a fake number from two players simply changing slot labels. If nothing about the lineup's value actually changed, it says so plainly instead of inventing a trade that didn't happen.</p>
+        <ul class="tour-points">
+          <li>Every OUT/IN row nets to real, verified points — no phantom swaps</li>
+          <li>"Slot changes made (no lineup change)" when the reorg has zero impact</li>
+          <li>Bulk-apply every league at once, or open any single one in the full editor first</li>
+        </ul>
+      </div>
+      <div class="tour-shot">
+        <div class="shot-frame"><img src="screenshots/optimizer.png" alt="QuickManager Mass Lineup Optimizer showing per-league results, an optimal lineup, and a real point swap with an honest slot-change note" loading="lazy"></div>
+      </div>
+    </div>
+
+    <div class="tour-row reverse">
+      <div class="tour-text">
+        <span class="kicker">Matchups &amp; Power Rankings</span>
+        <h3>Know where your week actually swings</h3>
+        <p>See this week's matchup and win probability for every league at once, then run a full season simulation to find which leagues are still genuinely in play. A cross-league table ranks every roster by how much attention is actually worth spending on it right now.</p>
+        <ul class="tour-points">
+          <li>Real-time win probability alongside the projected score, every league</li>
+          <li>Simulated playoff odds, sortable by week-swing, fragility, or weakest slot</li>
+          <li>Click any league for the full detail view — see below</li>
+        </ul>
+      </div>
+      <div class="tour-shot">
+        <div class="shot-frame"><img src="screenshots/matchups-tab.png" alt="QuickManager Weekly Matchups with win probability, and the Power Rankings cross-league triage table ranked by week swing" loading="lazy"></div>
+      </div>
+    </div>
+
+    <div class="tour-row">
+      <div class="tour-text">
+        <span class="kicker">Power Rankings — Detail View</span>
+        <h3>Not just odds — the whole shape of your season</h3>
+        <p>A fan chart of every simulated path shows exactly when your season's outcomes actually separate, with the real playoff cut line drawn in from the simulation itself. A positional table ranks your team against the rest of the league at every position, so you know precisely what to go fix.</p>
+        <ul class="tour-points">
+          <li>Thousands of simulated seasons, condensed into percentile bands and a median path</li>
+          <li>Toggle between your optimal lineup and a depth/injury-adjusted model</li>
+          <li>Position-by-position rank against the whole league, not just a total score</li>
+        </ul>
+      </div>
+      <div class="tour-shot">
+        <div class="shot-frame"><img src="screenshots/sim-detail.png" alt="QuickManager Power Rankings detail view with a win-total histogram, a fan chart of simulated season paths, and a positional production table" loading="lazy"></div>
+      </div>
+    </div>
+
+    <div class="tour-row reverse">
+      <div class="tour-text">
+        <span class="kicker">Player Portfolio</span>
+        <h3>Every player you own, across every league, at once</h3>
+        <p>See your real cross-league exposure to any one player — who you're most riding on, and which of those leagues are actually still live. Age context flags players entering, past, or well beyond their typical prime, without ever predicting what they'll do next.</p>
+        <ul class="tour-points">
+          <li>One list, every league — filterable by league type or position</li>
+          <li>Exposure percentage per player, with a live-league count next to it</li>
+          <li>Age-window flags (ascending, prime, past-prime, age risk) as context, never a forecast</li>
+        </ul>
+      </div>
+      <div class="tour-shot">
+        <div class="shot-frame"><img src="screenshots/portfolio.png" alt="QuickManager Player Portfolio showing cross-league exposure percentages and age context for every rostered player" loading="lazy"></div>
+      </div>
+    </div>
+
+    <div class="tour-row">
+      <div class="tour-text">
+        <span class="kicker">Waiver Wire &amp; Free Agent Radar</span>
+        <h3>Find the add, build the claim, in one screen</h3>
+        <p>Free Agent Radar scans the whole player pool for standouts — filter by position or NFL team, include already-rostered players to scout trade targets, and add anyone straight to the Waiver Board. Manage every pending claim across every league without hunting league by league.</p>
+        <ul class="tour-points">
+          <li>Position and team filters, plus an "include rostered" toggle for trade scouting</li>
+          <li>One-click add to the Waiver Board, single or in bulk</li>
+          <li>Mass Drop and pending-claim management for every league, in one place</li>
+        </ul>
+      </div>
+      <div class="tour-shot">
+        <div class="shot-frame"><img src="screenshots/waiver-tab.png" alt="QuickManager Waiver Wire tab with pending waivers, the Waiver Board, Mass Drop, and Free Agent Radar with position and team filters" loading="lazy"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section id="whats-new" style="background:var(--bg-deep);">
   <div class="wrap">
     <div class="section-head">
-      <span class="soon-badge"><span class="dot"></span> Coming in v1.4.9</span>
-      <h2>The Waiver Board, and a smarter way to manage what you've already sent.</h2>
-      <p>Here's what's coming in the next update.</p>
+      <span class="soon-badge"><span class="dot"></span> Recently shipped — v1.5.0</span>
+      <h2>Six more things nobody asked us to build twice.</h2>
+      <p>Beyond the season simulator above, here's what else landed recently.</p>
     </div>
     <div class="whats-new-grid">
       <div class="whatsnew-card">
-        <span class="tag">Waiver Wire</span>
-        <h3>The Waiver Board</h3>
-        <p>Add the players you want this week to one list, and see instantly which of your leagues each one is actually available in. QuickManager builds a claim per target automatically, using your own bench to suggest a drop — but never decides for you. Change the drop from a dropdown, or click "try another drop" to add your own fallback attempt, right on the same claim.</p>
+        <span class="tag">Draft Picks</span>
+        <h3>Exact Pick Slots, Not Just "Round 1"</h3>
+        <p>Draft picks now resolve to a real slot — "1.05, 5th overall" — computed from your league's actual draft order, handling snake, linear, and 3rd-round-reversal formats. When a draft's order genuinely isn't set yet, it says so plainly instead of guessing.</p>
       </div>
       <div class="whatsnew-card">
-        <span class="tag">Waiver Wire</span>
-        <h3>Build From a Ranking</h3>
-        <p>Prefer to think in relative value instead of one claim at a time? Drag your targets against your own bench, best to worst, and QuickManager works out the full sequence of claims for you — which drop unlocks which add, and in what order to submit them.</p>
+        <span class="tag">League View</span>
+        <h3>Standings That Flag Who's Actually Lucky</h3>
+        <p>Real standings for any league, with every team clickable straight to their roster and draft picks. A "lucky" / "unlucky" flag compares scoring rank against win rank — useful the moment you're sizing up a trade partner's record.</p>
       </div>
       <div class="whatsnew-card">
-        <span class="tag">Waiver Wire</span>
-        <h3>Autofill Bids From a Max %</h3>
-        <p>Set the most you'd pay for a player once, as a percentage of budget, and QuickManager fills in the dollar amount correctly in every league — accounting for what's already committed to other claims in the same league.</p>
+        <span class="tag">Roster Editor</span>
+        <h3>Spy Mode</h3>
+        <p>Look up another manager's roster and situation without pretending you can act on it — the tabs that would let you submit anything are grayed out automatically the moment you're viewing someone else's team.</p>
       </div>
       <div class="whatsnew-card">
-        <span class="tag">Pending Waivers</span>
-        <h3>Manage What You've Already Sent, In Place</h3>
-        <p>Your already-submitted claims for a league now show up right on the Waiver Board — edit the bid, change who gets dropped (including switching to an open roster spot if one's freed up since you submitted it), or cancel. No trip to a separate screen.</p>
+        <span class="tag">Waiver Board</span>
+        <h3>An Optional Cap on Total FAAB Spend</h3>
+        <p>Set a ceiling on what a whole board of claims could cost you, across every claim at once. It catches the case where the cap you set is actually lower than your own top single bid, before you submit anything.</p>
       </div>
       <div class="whatsnew-card">
-        <span class="tag">Waiver Wire</span>
-        <h3>Mass Drop</h3>
-        <p>Cut a flier from every league you added them to, in one action — handy the moment a stash you added everywhere stops being worth the roster spot. Suggested Drops flags anyone already on your rosters who's no longer on an NFL roster at all.</p>
+        <span class="tag">Power Rankings</span>
+        <h3>Save the Whole Run</h3>
+        <p>A season simulation takes real time to compute — now you can save the entire result as a self-contained page you can reopen or print, or export the summary table straight to a spreadsheet.</p>
       </div>
       <div class="whatsnew-card">
-        <span class="tag">Waiver Wire</span>
-        <h3>Season-Average Rankings</h3>
-        <p>Rankings inside the Waiver Board now use a player's average projected value across the season, not just this week's number — so a normally-good starter who's banged up for a single week doesn't get unfairly buried at the bottom of a comparison.</p>
+        <span class="tag">Everywhere</span>
+        <h3>Full IDP Support</h3>
+        <p>Defensive players are ranked, optimized, and slotted correctly wherever the extension touches a lineup — DL, LB, and DB starters are treated exactly like every offensive position, using your league's own IDP scoring.</p>
       </div>
     </div>
   </div>
@@ -623,6 +749,7 @@
       </div>
       <div class="footer-links">
         <a href="#features">Features</a>
+        <a href="#tour">Screenshots</a>
         <a href="features.html">All features</a>
         <a href="#pricing">Pricing</a>
         <a href="#setup">Setup</a>
