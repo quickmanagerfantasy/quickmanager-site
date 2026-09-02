@@ -520,29 +520,43 @@
         <div class="shot-frame"><img src="screenshots/waiver-tab.png" alt="QuickManager Waiver Wire tab with pending waivers, the Waiver Board, Mass Drop, and Free Agent Radar with position and team filters" loading="lazy"></div>
       </div>
     </div>
+
+    <div class="tour-row reverse">
+      <div class="tour-text">
+        <span class="kicker">Trade Factory</span>
+        <h3>Deterministic Trade Impact</h3>
+        <p>Before pulling the trigger on a trade, run a two-sided Monte Carlo simulation. QuickManager isolates exactly how a trade impacts both teams' playoff odds, and its optional depth-injury model reveals the hidden fragility in trading a star for scrubs.</p>
+        <ul class="tour-points">
+          <li>Isolates the exact playoff odds impact using 2,000 parallel realities</li>
+          <li>Depth-injury model simulates random injuries across both sides of the trade</li>
+          <li>Works flawlessly for blockbusters involving both players and draft picks</li>
+        </ul>
+      </div>
+      <div class="tour-shot">
+        <div class="shot-frame"><img src="screenshots/trade-simulator.png" alt="QuickManager Trade Impact Simulator showing before and after playoff odds and the roster fragility chart" loading="lazy"></div>
+      </div>
+    </div>
   </div>
 </section>
 
 <section id="whats-new" style="background:var(--bg-deep);">
   <div class="wrap">
     <div class="section-head">
-      <span class="soon-badge"><span class="dot"></span> Recently shipped — v1.5.0</span>
+      <span class="soon-badge"><span class="dot"></span> Coming in v1.5.3</span>
       <h2>Six more things nobody asked us to build twice.</h2>
-      <p>Beyond the season simulator above, here's what else landed recently.</p>
+      <p>Beyond the season simulator above, here's what's landing next.</p>
     </div>
-
-    <div class="shot-frame" style="margin-bottom: 36px;"><img src="screenshots/matchups-tab.png" alt="QuickManager Matchups tab showing My Leagues with League View and draft pick links, and the Power Rankings triage table" loading="lazy"></div>
 
     <div class="whats-new-grid">
       <div class="whatsnew-card">
-        <span class="tag">Draft Picks</span>
-        <h3>Exact Pick Slots, Not Just "Round 1"</h3>
-        <p>Draft picks now resolve to a real slot — "1.05, 5th overall" — computed from your league's actual draft order, handling snake, linear, and 3rd-round-reversal formats. When a draft's order genuinely isn't set yet, it says so plainly instead of guessing.</p>
+        <span class="tag">Trade Factory</span>
+        <h3>Deterministic Trade Impact</h3>
+        <p>Before pulling the trigger on a trade, run a two-sided Monte Carlo simulation. By running 2,000 parallel realities for both teams using a shared seed, it isolates the exact playoff odds change caused purely by the trade itself.</p>
       </div>
       <div class="whatsnew-card">
-        <span class="tag">League View</span>
-        <h3>Standings That Flag Who's Actually Lucky</h3>
-        <p>Real standings for any league, with every team clickable straight to their roster and draft picks. A "lucky" / "unlucky" flag compares scoring rank against win rank — useful the moment you're sizing up a trade partner's record.</p>
+        <span class="tag">Trade Factory</span>
+        <h3>Roster Fragility Model</h3>
+        <p>A star-for-scrubs trade looks great until a bye week hits. The Trade Simulator now features an optional depth-injury risk model that applies random injuries to both sides of the trade to reveal how it actually impacts your roster's fragility.</p>
       </div>
       <div class="whatsnew-card">
         <span class="tag">Roster Editor</span>
@@ -555,9 +569,9 @@
         <p>Set a ceiling on what a whole board of claims could cost you, across every claim at once. It catches the case where the cap you set is actually lower than your own top single bid, before you submit anything.</p>
       </div>
       <div class="whatsnew-card">
-        <span class="tag">Power Rankings</span>
-        <h3>Save the Whole Run</h3>
-        <p>A season simulation takes real time to compute — now you can save the entire result as a self-contained page you can reopen or print, or export the summary table straight to a spreadsheet.</p>
+        <span class="tag">Draft Picks</span>
+        <h3>Exact Pick Slots, Not Just "Round 1"</h3>
+        <p>Draft picks now resolve to a real slot — "1.05, 5th overall" — computed from your league's actual draft order, handling snake, linear, and 3rd-round-reversal formats. When a draft's order genuinely isn't set yet, it says so plainly instead of guessing.</p>
       </div>
       <div class="whatsnew-card">
         <span class="tag">Everywhere</span>
