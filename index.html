@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>QuickManager — Multi-League Fantasy Tools for Sleeper</title>
-<meta name="description" content="Manage all your Sleeper fantasy football leagues at once: mass lineup optimizer, season simulation and power rankings, waiver tools, and cross-league trades.">
+<meta name="description" content="Manage all your Sleeper fantasy football leagues at once: mass lineup optimizer, a gameday board that finds the lineups needing a fix before kickoff, season simulation and power rankings, waiver tools, and cross-league trades.">
 <link rel="icon" type="image/png" href="icons/icon32.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -380,6 +380,7 @@
     <span class="ticker-item"><b>PENDING WAIVERS</b> <span class="sep">·</span> cancel across leagues in one click</span>
     <span class="ticker-item"><b>TRADE FACTORY</b> <span class="sep">·</span> propose &amp; review in bulk</span>
     <span class="ticker-item"><b>PLAYER PORTFOLIO</b> <span class="sep">·</span> every league's exposure at once</span>
+    <span class="ticker-item"><b>GAMEDAY BOARD</b> <span class="sep">·</span> every lineup, in kickoff order</span>
     <span class="ticker-item"><b>1 CLICK</b> <span class="sep">·</span> applies to every roster</span>
     <span class="ticker-item"><b>PRIVATE BY DESIGN</b> <span class="sep">·</span> no server, no data collection</span>
     <span class="ticker-item"><b>LINEUP OPTIMIZER</b> <span class="sep">·</span> scans every league</span>
@@ -389,6 +390,7 @@
     <span class="ticker-item"><b>PENDING WAIVERS</b> <span class="sep">·</span> cancel across leagues in one click</span>
     <span class="ticker-item"><b>TRADE FACTORY</b> <span class="sep">·</span> propose &amp; review in bulk</span>
     <span class="ticker-item"><b>PLAYER PORTFOLIO</b> <span class="sep">·</span> every league's exposure at once</span>
+    <span class="ticker-item"><b>GAMEDAY BOARD</b> <span class="sep">·</span> every lineup, in kickoff order</span>
     <span class="ticker-item"><b>1 CLICK</b> <span class="sep">·</span> applies to every roster</span>
     <span class="ticker-item"><b>PRIVATE BY DESIGN</b> <span class="sep">·</span> no server, no data collection</span>
   </div>
@@ -420,7 +422,7 @@
       <div class="feature-card gold-edge">
         <span class="num">04 — MATCHUPS &amp; POWER RANKINGS</span>
         <h3>Season Simulation, League by League</h3>
-        <p>See this week's matchup and win probability everywhere at once, then simulate the rest of the season thousands of times for real playoff odds, a positional breakdown against the league, and a full player-exposure view across every roster you own.</p>
+        <p>See this week's matchup and win probability everywhere at once, then simulate the rest of the season thousands of times for real playoff odds and a positional breakdown against the league. The Player Portfolio adds the gameday pass: every lineup you manage, in kickoff order, showing only the ones that still need a decision.</p>
       </div>
     </div>
     <div style="text-align:center; margin-top:38px;">
@@ -507,6 +509,22 @@
 
     <div class="tour-row">
       <div class="tour-text">
+        <span class="kicker">Player Portfolio — Gameday</span>
+        <h3>Every lineup you manage, in kickoff order</h3>
+        <p>Sunday morning, a dozen teams, not much time. This finds the two or three lineups that actually need a click and stays quiet about the rest — an upgrade worth making, a starter who's been ruled out, an empty slot — then writes the change back to Sleeper without leaving the page.</p>
+        <ul class="tour-points">
+          <li>Ordered by kickoff, because that's the deadline — anything already locked is marked, never offered</li>
+          <li>Every suggestion names both sides: who comes in, who goes out, and what the swap is worth</li>
+          <li>Tick the ones you agree with and apply them across every league at once</li>
+        </ul>
+      </div>
+      <div class="tour-shot">
+        <div class="shot-frame"><img src="screenshots/GameDay_Portfolio.png" alt="QuickManager Gameday board listing cross-league lineup swaps in kickoff order, each naming the player coming in, the player going out, and the projected points gained" loading="lazy"></div>
+      </div>
+    </div>
+
+    <div class="tour-row reverse">
+      <div class="tour-text">
         <span class="kicker">Waiver Wire &amp; Free Agent Radar</span>
         <h3>Find the add, build the claim, in one screen</h3>
         <p>Free Agent Radar scans the whole player pool for standouts — filter by position or NFL team, include already-rostered players to scout trade targets, and add anyone straight to the Waiver Board. Manage every pending claim across every league without hunting league by league.</p>
@@ -521,7 +539,7 @@
       </div>
     </div>
 
-    <div class="tour-row reverse">
+    <div class="tour-row">
       <div class="tour-text">
         <span class="kicker">Trade Factory</span>
         <h3>Deterministic Trade Impact</h3>
@@ -543,11 +561,16 @@
   <div class="wrap">
     <div class="section-head">
       <span class="soon-badge"><span class="dot"></span> Coming in v1.5.3</span>
-      <h2>Six more things nobody asked us to build twice.</h2>
+      <h2>Seven more things nobody asked us to build twice.</h2>
       <p>Beyond the season simulator above, here's what's landing next.</p>
     </div>
 
     <div class="whats-new-grid">
+      <div class="whatsnew-card" style="grid-column: 1 / -1;">
+        <span class="tag">Player Portfolio</span>
+        <h3>The Gameday Board</h3>
+        <p>Every lineup you manage, ordered by kickoff, showing only what still needs a decision — an upgrade worth making, a starter who's been ruled out, an empty slot. Each suggestion names both players, the slot it touches, and what the swap is actually worth in that league's own scoring. Tick the ones you agree with and apply them across every league at once. Anything already locked is marked as locked and never offered.</p>
+      </div>
       <div class="whatsnew-card">
         <span class="tag">Trade Factory</span>
         <h3>Deterministic Trade Impact</h3>
