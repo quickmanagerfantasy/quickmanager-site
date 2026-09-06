@@ -373,7 +373,7 @@
 
 <div id="top" class="feat-hero">
   <div class="wrap">
-    <span class="eyebrow"><span class="dot"></span> 53 features · v1.5.0</span>
+    <span class="eyebrow"><span class="dot"></span> 73 features · v1.6.0</span>
     <h1>Everything QuickManager<br>can do</h1>
     <p>Grouped by where you'll find it in the extension, so you can look something up rather than read the whole list.</p>
     <div class="tab-jump"><a href="#lineups">Lineups</a><a href="#matchups">Matchups &amp; Power Rankings</a><a href="#portfolio">Player Portfolio</a><a href="#waivers">Waivers &amp; Free Agents</a><a href="#trades">Trades</a><a href="#rosters">Roster Health</a><a href="#account">Setup &amp; Account</a></div>
@@ -425,10 +425,13 @@
       <div class="feat"><h3>Cross-league triage table</h3><p>Every league ranked by how much this week's result actually swings your season — sortable by playoff odds, week-swing, fragility, or weakest slot.</p></div>
       <div class="feat"><h3>Fan chart of simulated season paths</h3><p>Cumulative wins week by week across every simulated season, condensed into percentile bands with the median path and the real playoff cut line drawn in.</p></div>
       <div class="feat"><h3>Positional production vs the league</h3><p>Ranks your optimal lineup's output at every position against the rest of the league, so you know exactly what to go fix.</p></div>
+      <div class="feat"><h3>League-wide positional breakdown</h3><p>Click any position to open the whole league in that one slot: every manager ranked by its projected production, with the players carrying it listed beside them. Sortable by every column.</p></div>
+      <div class="feat"><h3>Contributors matched to real starting slots</h3><p>The number of players listed for a slot comes from your league's own lineup settings, so a 3-WR league lists three &mdash; and SUPERFLEX is ranked separately from FLEX rather than folded into it.</p></div>
       <div class="feat"><h3>Weakest-slot &amp; fragility analysis</h3><p>Flags your single weakest starting slot against the league median, and how many points of playoff odds you're exposed to from an injury.</p></div>
       <div class="feat"><h3>League View</h3><p>Full standings for any league — real record, points for/against, and a "lucky" / "unlucky" flag from comparing scoring rank to win rank. Every team is clickable straight to their roster and draft picks.</p></div>
       <div class="feat"><h3>Exact draft pick slots</h3><p>Picks resolve to a real slot ("1.05, 5th overall") computed from the actual draft order, handling snake, linear, and 3rd-round-reversal leagues correctly.</p></div>
-      <div class="feat"><h3>Save &amp; export a run</h3><p>Save a full Power Rankings run as a self-contained page you can reopen or print, or export the summary table to a CSV for a spreadsheet.</p></div>
+      <div class="feat"><h3>Save &amp; export a run</h3><p>Save a full Power Rankings run as a self-contained page you can reopen, print or share &mdash; the positional breakdown opens inside the saved file too.</p></div>
+      <div class="feat"><h3>Starters CSV and XLSX</h3><p>Export one row per team, per starting slot, per contributing player &mdash; as a flat CSV, or as a spreadsheet with each league on its own sheet and numbers left numeric so they sort and chart.</p></div>
       <div class="feat"><h3>Spy Mode</h3><p>Look up another manager's roster and situation read-only — anything that would let you act on their behalf is automatically disabled while you're viewing someone else's team.</p></div>
     </div>
   </div>
@@ -509,6 +512,11 @@
       <div class="feat"><h3>Modify your own offer</h3><p>Change an offer you've already made instead of withdrawing it and starting over.</p></div>
       <div class="feat"><h3>Edit both sides</h3><p>Add or remove players and picks on either half of the trade, including asking for something new from their roster.</p></div>
       <div class="feat"><h3>Send a DM with your offer</h3><p>Optionally attach a Sleeper direct message to every trade you send, so the other manager actually notices it. Works for single and bulk sends.</p></div>
+      <div class="feat"><h3>Confirm before anything sends</h3><p>Every propose, bulk propose, counter and simulator offer stops at a summary of exactly what moves each way. Cancel leaves the builder untouched.</p></div>
+      <div class="feat"><h3>Propose straight from the simulator</h3><p>Once a simulated trade is aimed at a specific manager rather than a hypothetical one, send it without rebuilding it in the Trade Factory.</p></div>
+      <div class="feat"><h3>Trade with a chosen manager</h3><p>The simulator defaults to "anyone (hypothetical)" and narrows to one manager on request, which is what makes their draft picks selectable.</p></div>
+      <div class="feat"><h3>Pick from their roster, or search</h3><p>Choosing a partner shows their players as a selectable list. The search box stays, for anyone who would rather type a name.</p></div>
+      <div class="feat"><h3>FAAB in trades</h3><p>Waiver budget moves as its own leg of a trade, parsed and sent the way Sleeper models it &mdash; visible in the summary, the DM and the offer, including through a counter.</p></div>
     </div>
   </div>
 </section>
@@ -541,6 +549,8 @@
     <div class="feat-list">
       <div class="feat"><h3>Automatic connection</h3><p>Log into Sleeper as normal and the extension picks up your session and confirms it's really yours — nothing to copy, paste, or double-check. On iPhone and iPad, where Orion is the only browser that supports extensions like this, a manual token-paste option is there as a fallback.</p></div>
       <div class="feat"><h3>Choose which leagues count</h3><p>Opt any league in or out; every tool respects that choice.</p></div>
+      <div class="feat"><h3>Filters that only offer what applies</h3><p>League filters hide options that would return nothing &mdash; a format or a manager you have no league for is simply not listed.</p></div>
+      <div class="feat"><h3>Team Name (manager), everywhere</h3><p>Every place the extension names a team or a manager, it names both, in one consistent format across every tool.</p></div>
     </div>
   </div>
 </section>

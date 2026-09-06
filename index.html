@@ -440,7 +440,7 @@
     <div class="section-head">
       <span class="kicker">See it running</span>
       <h2>The actual product. No mockups.</h2>
-      <p>Every screenshot below is a real run against real leagues — nothing staged for the page.</p>
+      <p>Every screenshot below is the real interface, not a mockup. Most are live runs against real leagues; the positional breakdown uses a sample one so nobody else&rsquo;s team names end up on this page.</p>
     </div>
 
     <div class="tour-row">
@@ -554,15 +554,64 @@
         <div class="shot-frame"><img src="screenshots/trade-simulator.png" alt="QuickManager Trade Impact Simulator showing before and after playoff odds and the roster fragility chart" loading="lazy"></div>
       </div>
     </div>
+
+    <div class="tour-row reverse">
+      <div class="tour-text">
+        <span class="kicker">New in 1.6.0</span>
+        <h3>Who is actually good at wide receiver, and on the back of whom</h3>
+        <p>Click any position in a league's simulation and the whole league opens up in that one slot: every manager ranked by what it is projected to produce, with the players carrying it listed beside them. Sort by any column to flip the question around.</p>
+        <ul class="tour-points">
+          <li>The number of players listed matches what your league actually starts &mdash; three in a 3-WR league, not one</li>
+          <li>SUPERFLEX is its own row, never folded into FLEX, so a superflex league reads correctly</li>
+          <li>Points are what each player is projected to earn <em>while filling that slot</em> &mdash; a tight end who keeps winning your flex shows up under FLEX</li>
+        </ul>
+      </div>
+      <div class="tour-shot">
+        <div class="shot-frame"><img src="screenshots/positional-breakdown.png" alt="QuickManager positional breakdown listing every manager in a league ranked by projected wide receiver production, with their top three contributing receivers beside each row" loading="lazy"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="whats-new-16">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="soon-badge"><span class="dot"></span> Shipping now &mdash; v1.6.0</span>
+      <h2>Ready for the season.</h2>
+      <p>A big round of interface work ahead of kickoff &mdash; the screens you'll live in on a Sunday, rebuilt around what you actually do with them.</p>
+    </div>
+
+    <div class="whats-new-grid">
+      <div class="whatsnew-card" style="grid-column: 1 / -1;">
+        <span class="tag">Power Rankings</span>
+        <h3>The Positional Breakdown</h3>
+        <p>Every position in a simulated league is now a link. Open one and you get the entire league ranked by that slot's projected production, each manager sitting next to the players carrying it &mdash; sortable by any column. The number of contributors matches the number of starters your league actually uses, and SUPERFLEX is ranked on its own rather than folded into FLEX, so a superflex league finally reads the way it plays.</p>
+      </div>
+      <div class="whatsnew-card">
+        <span class="tag">Trade Factory</span>
+        <h3>Trades, Start to Finish</h3>
+        <p>Point the simulator at a specific manager and their roster becomes a selectable list, their draft picks come into play, and you can send the offer without rebuilding it somewhere else &mdash; with a DM attached if you want one. Everything the extension sends now stops at a summary of what's moving each way, so nothing reaches Sleeper you haven't read.</p>
+      </div>
+      <div class="whatsnew-card">
+        <span class="tag">Exports</span>
+        <h3>Take the Numbers With You</h3>
+        <p>Export your starters one row per team, per slot, per contributing player &mdash; as a flat CSV, or as a spreadsheet with each league on its own sheet and the numbers left as numbers so they sort and chart. The saved HTML page carries the positional breakdown with it too.</p>
+      </div>
+      <div class="whatsnew-card">
+        <span class="tag">Everywhere</span>
+        <h3>Say Who You Mean</h3>
+        <p>Teams and managers are named together, in one consistent format, everywhere the extension mentions either &mdash; so you stop having to remember which of your leagues calls that person what. League filters stopped offering options that would return nothing, too.</p>
+      </div>
+    </div>
   </div>
 </section>
 
 <section id="whats-new" style="background:var(--bg-deep);">
   <div class="wrap">
     <div class="section-head">
-      <span class="soon-badge"><span class="dot"></span> Coming in v1.5.3</span>
+      <span class="soon-badge"><span class="dot"></span> Also in the build</span>
       <h2>Seven more things nobody asked us to build twice.</h2>
-      <p>Beyond the season simulator above, here's what's landing next.</p>
+      <p>Shipped before 1.6.0, and all still here.</p>
     </div>
 
     <div class="whats-new-grid">
