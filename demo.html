@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QuickManager Power Rankings — 2026-09-06</title>
+<style>
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85);
+            display: none; justify-content: center; align-items: center;
+            z-index: 60; padding: 1rem;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-overlay .modal-content {
+            width: 100%; max-width: 760px; max-height: 85vh;
+            display: flex; flex-direction: column; overflow: hidden;
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 0.6rem;
+        }
+        .modal-overlay .card-header {
+            padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center; gap: 0.75rem;
+        }
+        .modal-scroll-area { overflow-y: auto; }
+        .hidden { display: none !important; }
+        :root {
+            color-scheme: dark;
+            --bg-main: #0f172a; --bg-card: #1e293b; --border-color: #334155;
+            --text-main: #f8fafc; --text-muted: #94a3b8;
+            --accent-blue: #3b82f6; --status-red: #ef4444;
+            --status-green: #22c55e; --status-yellow: #eab308;
+            --status-purple: #a855f7;
+        }
+        body {
+            background: var(--bg-main); color: var(--text-main); margin: 0;
+            padding: 1.5rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .result-card {
+            background: var(--bg-main); border: 1px solid var(--border-color);
+            border-radius: 0.6rem; padding: 1rem 1.1rem; margin-bottom: 1rem;
+        }
+        .result-header {
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 1rem; margin-bottom: 1rem; padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color); flex-wrap: wrap;
+        }
+        .result-title { margin: 0; font-size: 1.05rem; overflow-wrap: anywhere; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        /* The saved copy is a static snapshot: click-to-open-roster
+           can't work outside the extension. Neutralize the affordances so the
+           file doesn't invite clicks that silently do nothing. */
+        .standings-team-link {
+            cursor: default !important; text-decoration: none !important;
+        }
+        .export-meta {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 0.6rem; padding: 1rem 1.1rem; margin-bottom: 1.25rem;
+            font-size: 0.85rem; color: var(--text-muted);
+        }
+        .export-meta h1 { margin: 0 0 0.5rem; font-size: 1.15rem; color: var(--accent-blue); }
+        .export-meta dl { display: grid; grid-template-columns: auto 1fr; gap: 0.25rem 1rem; margin: 0; }
+        .export-meta dt { color: var(--text-muted); }
+        .export-meta dd { margin: 0; color: var(--text-main); }
+        @media print { body { background: #fff; color: #000; } }
+    </style>
+</head><body>
+<div style="max-width: 1100px; margin: 0 auto 1.25rem; padding: 0.85rem 1rem; border: 1px solid #3b82f6; border-left-width: 4px; border-radius: 0.5rem; background: rgba(59,130,246,0.10); font-size: 0.88rem; line-height: 1.5;">
+<strong style="color: #3b82f6;">This is a demo.</strong>
+The two leagues below are invented and so are the projections behind them &mdash; no real league, manager or team name appears on this page.
+Everything else is genuine output: the season simulation, the playoff odds, the charts and the positional breakdown were all produced by the extension itself, and this file is exactly what its
+<em>Save as HTML</em> button writes. Click a league row, then click any blue position, to explore it.
+<a href="./" style="color: #f5b31a;">What is QuickManager?</a>
+</div>
+
+
+            <div class="export-meta">
+                <h1>QuickManager — Power Rankings</h1>
+                <dl>
+                    <dt>Saved</dt><dd>9/6/2026, 4:42:02 PM</dd>
+                    <dt>Week</dt><dd>10</dd>
+                    <dt>Leagues</dt><dd>2</dd>
+                    <dt>Calibrated σ</dt><dd>Off — structural σ from league settings</dd>
+                    <dt>Depth / fragility</dt><dd>On — availability risk simulated</dd>
+                </dl>
+                <p style="margin: 0.75rem 0 0; font-style: italic;">Interactive snapshot. Click any league row to view the detailed simulation distributions and positional breakdowns.</p>
+            </div>
+<div id="triage-table-card" class="result-card" style="margin-bottom: 1.25rem; border: 1px solid var(--accent-blue);">
+            <div class="result-header">
+                <h3 class="result-title" style="color: var(--accent-blue);">Where your attention is worth the most</h3>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.3rem 0 0.6rem;">Click a column to sort. High week swing = a waiver claim or lineup fix here changes something. Low swing = you're locked in or already out, so spend the time elsewhere. Click a league to view that roster.</p>
+            <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                <thead><tr style="border-bottom: 2px solid var(--border-color); color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;"><th data-sort-key="leagueName" style="text-align: left; padding: 0.3rem 0.5rem 0.3rem 0; cursor: pointer; user-select: none; ">League</th><th data-sort-key="playoffOdds" style="text-align: right; padding: 0.3rem 0.5rem; cursor: pointer; user-select: none; " title="Sim playoff rate">Playoffs</th><th data-sort-key="byeOdds" style="text-align: right; padding: 0.3rem 0.5rem; cursor: pointer; user-select: none; " title="Odds of a first-round bye">Bye</th><th data-sort-key="status" style="text-align: left; padding: 0.3rem 0.5rem 0.3rem 0; cursor: pointer; user-select: none; ">Status</th><th data-sort-key="weekLeverage" style="text-align: right; padding: 0.3rem 0.5rem; cursor: pointer; user-select: none; color: var(--accent-blue);" title="Win vs lose this week, difference in playoff rate">Week swing ▼</th><th data-sort-key="fragility" style="text-align: right; padding: 0.3rem 0.5rem; cursor: pointer; user-select: none; " title="Playoff rate lost to availability risk">Fragility</th><th data-sort-key="weakestSlot" style="text-align: left; padding: 0.3rem 0.5rem 0.3rem 0; cursor: pointer; user-select: none; " title="Weakest starting slot vs league median">Weakest slot</th></tr></thead>
+                <tbody>
+                <tr style="border-bottom: 1px solid var(--border-color);">
+                    <td data-sort-val="sunday scaries superflex" style="padding: 0.35rem 0.5rem 0.35rem 0; font-weight: 600;"><span class="triage-league-link" data-league-id="demo_sf_2026" style="cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px;" title="Open Sunday Scaries Superflex's roster">Sunday Scaries Superflex</span> <span class="triage-detail-link" data-league-id="demo_sf_2026" title="Sim outcome spread and positional breakdown for Sunday Scaries Superflex" style="cursor: pointer; color: var(--status-green); font-size: 0.72rem; font-weight: 700; white-space: nowrap;">detail</span></td>
+                    <td data-sort-val="0.6142" style="padding: 0.35rem 0.5rem; text-align: right; font-weight: 700;">61%</td>
+                    <td data-sort-val="0.1974" style="padding: 0.35rem 0.5rem; text-align: right; color: var(--text-muted);">20%</td>
+                    <td data-sort-val="0.6142" style="padding: 0.35rem 0.5rem; color: var(--status-green); font-weight: 600; font-size: 0.78rem;">CONTENDER</td>
+                    <td data-sort-val="0.3002" style="padding: 0.35rem 0.5rem; text-align: right; color: var(--status-green); font-weight: 700;">+30%</td>
+                    <td data-sort-val="0.008199999999999985" style="padding: 0.35rem 0.5rem; text-align: right; color: var(--text-muted);">−1</td>
+                    <td data-sort-val="-3.869999999999999" style="padding: 0.35rem 0 0.35rem 0.5rem; color: var(--text-muted); font-size: 0.78rem;">RB (-3.9)</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-color);">
+                    <td data-sort-val="waiver wire wednesday" style="padding: 0.35rem 0.5rem 0.35rem 0; font-weight: 600;"><span class="triage-league-link" data-league-id="demo_std_2026" style="cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px;" title="Open Waiver Wire Wednesday's roster">Waiver Wire Wednesday</span> <span class="triage-detail-link" data-league-id="demo_std_2026" title="Sim outcome spread and positional breakdown for Waiver Wire Wednesday" style="cursor: pointer; color: var(--status-green); font-size: 0.72rem; font-weight: 700; white-space: nowrap;">detail</span></td>
+                    <td data-sort-val="0.7968" style="padding: 0.35rem 0.5rem; text-align: right; font-weight: 700;">80%</td>
+                    <td data-sort-val="-1" style="padding: 0.35rem 0.5rem; text-align: right; color: var(--text-muted);">—</td>
+                    <td data-sort-val="0.7968" style="padding: 0.35rem 0.5rem; color: var(--status-green); font-weight: 600; font-size: 0.78rem;">CONTENDER</td>
+                    <td data-sort-val="0.2946" style="padding: 0.35rem 0.5rem; text-align: right; color: var(--status-green); font-weight: 700;">+29%</td>
+                    <td data-sort-val="0.0037999999999999146" style="padding: 0.35rem 0.5rem; text-align: right; color: var(--text-muted);">−0</td>
+                    <td data-sort-val="-0.8999999999999995" style="padding: 0.35rem 0 0.35rem 0.5rem; color: var(--text-muted); font-size: 0.78rem;">K (-0.9)</td>
+                </tr></tbody>
+            </table></div></div><div class="result-card" style="margin-bottom: 1rem;">
+            <div class="result-header">
+                <h3 class="result-title"><span class="open-league-view" data-league-id="demo_sf_2026" style="cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px;" title="Open full league view — standings, records, rosters and draft picks">Sunday Scaries Superflex</span></h3>
+            </div>
+            
+                <div style="margin: 0.6rem 0 0.2rem; padding: 0.5rem 0.7rem; background: var(--bg-main); border-left: 3px solid var(--status-green); border-radius: 0.3rem;">
+                    <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+                        <span style="font-weight: 700; color: var(--status-green); font-size: 0.85rem;">CONTENDER</span>
+                        <span style="font-weight: 700; font-size: 0.95rem;">61% sim playoff rate</span>
+                        <span style="font-size: 0.82rem; color: var(--text-muted);">20% first-round bye</span>
+                        <span class="sim-explainer-btn" style="cursor: help; color: var(--accent-blue); font-weight: 700; border: 1px solid var(--accent-blue); border-radius: 50%; width: 1.05rem; height: 1.05rem; display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;" title="NOT a prediction. This is how often this roster reached the playoffs across 5,000 simulated seasons, assuming every manager starts their best available lineup each week. It does NOT model trades, waivers, or specific injuries. Depth-adjusted mode approximates general availability risk by randomly making players unavailable and rebuilding the lineup from who's left — it measures how concentrated your production is, not who will actually get hurt.">i</span>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">Live and worth real attention — waivers and trades matter here.</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.35rem; font-size: 0.8rem;">
+                        <span style="color: var(--text-muted);">Depth-adjusted:</span>
+                        <strong>61%</strong>
+                        <span style="color: var(--status-green); font-weight: 700;">RESILIENT (−1 pts)</span>
+                        <span style="color: var(--text-muted);">Holds up well even when someone misses time.</span>
+                    </div>
+                </div>
+            <div style="margin-top: 0.5rem;"><button class="pr-detail-btn" data-league-id="demo_sf_2026" style="background: transparent; border: 1px solid var(--status-green); color: var(--status-green); font-weight: 600; font-size: 0.78rem; padding: 0.3rem 0.75rem; border-radius: 0.4rem; cursor: pointer;">Detailed view →</button></div>
+            
+                <div style="margin: 0.5rem 0 0.2rem; padding: 0.5rem 0.7rem; background: var(--bg-main); border-left: 3px solid var(--accent-blue); border-radius: 0.3rem; font-size: 0.8rem;">
+                    <div style="color: var(--text-muted);">
+                        Win this week → <strong style="color: var(--status-green);">85%</strong> · Lose → <strong style="color: var(--status-red);">55%</strong> <span style="color: var(--text-muted);">(swings +30.0%)</span>.
+                    </div>
+                    <div style="color: var(--text-muted); margin-top: 0.2rem;">Lineup is already worth ~all it can be this week.</div>
+                </div>
+            <div style="margin-top: 0.35rem; padding: 0.45rem 0.7rem; background: var(--bg-main); border-left: 3px solid var(--status-yellow); border-radius: 0.3rem; font-size: 0.8rem; color: var(--text-muted);">Weakest slot: <strong>RB</strong> at 10.1 pts/wk vs a league median of 13.9. An upgrade there is worth about <strong>3.9 pts/wk</strong>.</div>
+            <div style="margin-top: 0.3rem; font-size: 0.78rem; color: var(--text-muted);">Most concentrated at <strong>QB</strong> — losing your best one costs 15.3 pts/wk. That's where depth would help most.</div>
+            <div style="margin-top: 0.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; flex-wrap: wrap; gap: 0.4rem; ">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; min-width: 0;">
+                        <span style="color: var(--text-muted); font-weight: 700; width: 1.3rem; text-align: right;">1.</span>
+                        <span class="standings-team-link" style="font-weight: 600; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px;">The Bowers That Be (sam_h)</span>
+                    </div>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <span style="color: var(--text-muted);" title="Actual record right now">6-3</span>
+                        <span style="font-weight: 600; width: 5rem; text-align: right;" title="Projected final record (expected wins, fractional on purpose)">9.0-5.0</span>
+                        <span style="font-weight: 700; width: 3.2rem; text-align: right; color: var(--status-green);">87%</span>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; flex-wrap: wrap; gap: 0.4rem; ">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; min-width: 0;">
+                        <span style="color: var(--text-muted); font-weight: 700; width: 1.3rem; text-align: right;">2.</span>
+                        <span class="standings-team-link" style="font-weight: 600; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px;">Hurts So Good (tayl0r)</span>
+                    </div>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <span style="color: var(--text-muted);" title="Actual record right now">5-4</span>
+                        <span style="font-weight: 600; width: 5rem; text-align: right;" title="Projected final record (expected wins, fractional on purpose)">8.4-5.6</span>
+                        <span style="font-weight: 700; width: 3.2rem; text-align: right; color: var(--status-green);">77%</span>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; flex-wrap: wrap; gap: 0.4rem; ">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; min-width: 0;">
+                        <span style="color: var(--text-muted); font-weight: 700; width: 1.3rem; text-align: right;">3.</span>
+                        <span class="standings-team-link" style="font-weight: 600; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px;">Purdy Good Team (olu_a)</span>
+                    </div>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <span style="color: var(--text-muted);" title="Actual record right now">5-4</span>
+                        <span style="font-weight: 600; width: 5rem; text-align: right;" title="Projected final record (expected wins, fractional on purpose)">7.4-6.6</span>
+                        <span style="font-weight: 700; width: 3.2rem; text-align: right; color: var(--status-green);">62%</span>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; flex-wrap: wrap; gap: 0.4rem; background: rgba(34,197,94,0.06);">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; min-width: 0;">
+                        <span style="color: var(--text-muted); font-weight: 700; width: 1.3rem; text-align: right;">4.</span>
+                        <span class="standings-team-link" style="font-weight: 700; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px;">Chase Manhattan (demo_manager) <span style="font-size:0.7rem; color: var(--status-green);">(you)</span></span>
+                    </div>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <span style="color: var(--text-muted);" title="Actual record right now">6-3</span>
+                        <span style="font-weight: 600; width: 5rem; text-align: right;" title="Projected final record (expected wins, fractional on purpose)">8.2-5.8</span>
+                        <span style="font-weight: 700; width: 3.2rem; text-align: right; color: var(--status-green);">61%</span>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; flex-wrap: wrap; gap: 0.4rem; ">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; min-width: 0;">
+                        <span style="color: var(--text-muted); font-weight: 700; width: 1.3rem; text-align: right;">5.</span>
+                        <span class="standings-team-link" style="font-weight: 600; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px;">Nacua Matata (devin_t)</span>
+                    </div>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <span style="color: var(--text-muted);" title="Actual record right now">6-3</span>
+                        <span style="font-weight: 600; width: 5rem; text-align: right;" title="Projected final record (expected wins, fractional on purpose)">7.7-6.3</span>
+                        <span style="font-weight: 700; width: 3.2rem; text-align: right; color: var(--status-green);">57%</span>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; flex-wrap: wrap; gap: 0.4rem; ">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; min-width: 0;">
+                        <span style="color: var(--text-muted); font-weight: 700; width: 1.3rem; text-align: right;">6.</span>
+                        <span class="standings-team-link" style="font-weight: 600; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px;">Collins Calling (priya.k)</span>
+                    </div>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <span style="color: var(--text-muted);" title="Actual record right now">5-4</span>
+                        <span style="font-weight: 600; width: 5rem; text-align: right;" title="Projected final record (expected wins, fractional on purpose)">7.5-6.5</span>
+                        <span style="font-weight: 700; width: 3.2rem; text-align: right; color: var(--status-yellow);">49%</span>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; flex-wrap: wrap; gap: 0.4rem; ">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; min-width: 0;">
+                        <span style="color: var(--text-muted); font-weight: 700; width: 1.3rem; text-align: right;">7.</span>
+                        <span class="standings-team-link" style="font-weight: 600; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px;">Gibbs Me A Break (marcus.w)</span>
+                    </div>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <span style="color: var(--text-muted);" title="Actual record right now">5-4</span>
+                        <span style="font-weight: 600; width: 5rem; text-align: right;" title="Projected final record (expected wins, fractional on purpose)">7.1-6.9</span>
+                        <span style="font-weight: 700; width: 3.2rem; text-align: right; color: var(--status-yellow);">44%</span>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; flex-wrap: wrap; gap: 0.4rem; ">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; min-width: 0;">
+                        <span style="color: var(--text-muted); font-weight: 700; width: 1.3rem; text-align: right;">8.</span>
+                        <span class="standings-team-link" style="font-weight: 600; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px;">Hall of Shame (bex)</span>
+                    </div>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <span style="color: var(--text-muted);" title="Actual record right now">5-4</span>
+                        <span style="font-weight: 600; width: 5rem; text-align: right;" title="Projected final record (expected wins, fractional on purpose)">7.1-6.9</span>
+                        <span style="font-weight: 700; width: 3.2rem; text-align: right; color: var(--status-yellow);">38%</span>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; flex-wrap: wrap; gap: 0.4rem; ">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; min-width: 0;">
+                        <span style="color: var(--text-muted); font-weight: 700; width: 1.3rem; text-align: right;">9.</span>
+                        <span class="standings-team-link" style="font-weight: 600; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px;">Bijan Mustard (mikez)</span>
+                    </div>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <span style="color: var(--text-muted);" title="Actual record right now">4-5</span>
+                        <span style="font-weight: 600; width: 5rem; text-align: right;" title="Projected final record (expected wins, fractional on purpose)">7.0-7.0</span>
+                        <span style="font-weight: 700; width: 3.2rem; text-align: right; color: var(--status-yellow);">37%</span>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; flex-wrap: wrap; gap: 0.4rem; ">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; min-width: 0;">
+                        <span style="color: var(--text-muted); font-weight: 700; width: 1.3rem; text-align: right;">10.</span>
+                        <span class="standings-team-link" style="font-weight: 600; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px;">Nix Please (jordan_p)</span>
+                    </div>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <span style="color: var(--text-muted);" title="Actual record right now">4-5</span>
+                        <span style="font-weight: 600; width: 5rem; text-align: right;" title="Projected final record (expected wins, fractional on purpose)">6.9-7.1</span>
+                        <span style="font-weight: 700; width: 3.2rem; text-align: right; color: var(--status-yellow);">35%</span>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; flex-wrap: wrap; gap: 0.4rem; ">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; min-width: 0;">
+                        <span style="color: var(--text-muted); font-weight: 700; width: 1.3rem; text-align: right;">11.</span>
+                        <span class="standings-team-link" style="font-weight: 600; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px;">Saquon Barklily (nate99)</span>
+                    </div>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <span style="color: var(--text-muted);" title="Actual record right now">5-4</span>
+                        <span style="font-weight: 600; width: 5rem; text-align: right;" title="Projected final record (expected wins, fractional on purpose)">7.3-6.7</span>
+                        <span style="font-weight: 700; width: 3.2rem; text-align: right; color: var(--status-yellow);">34%</span>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; flex-wrap: wrap; gap: 0.4rem; ">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; min-width: 0;">
+                        <span style="color: var(--text-muted); font-weight: 700; width: 1.3rem; text-align: right;">12.</span>
+                        <span class="standings-team-link" style="font-weight: 600; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px;">Kittle Caesars (rachael.q)</span>
+                    </div>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <span style="color: var(--text-muted);" title="Actual record right now">4-5</span>
+                        <span style="font-weight: 600; width: 5rem; text-align: right;" title="Projected final record (expected wins, fractional on purpose)">6.5-7.5</span>
+                        <span style="font-weight: 700; width: 3.2rem; text-align: right; color: var(--status-red);">18%</span>
+                    </div>
+                </div></div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.5rem 0 0; font-style: italic;">Weeks 10–14 simulated assuming BOTH teams start their best lineup, top 6 make playoffs. Projected records are expected wins (a 55% game counts as 0.55, not a win) and further-out weeks are weighted closer to a coin flip, since projections that far ahead can't know about injuries or trades yet.</p>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0.3rem 0 0;">Remaining schedule: <strong style="color: var(--status-yellow);">4.5 pts/week harder</strong> than league average.</p>
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0.35rem 0 0;">σ ≈ 35.0 pts — derived from this league's own scoring rules and lineup shape (TD-heavy and superflex formats are noisier; PPR is calmer). Tick "Calibrate from past results" to measure it from real completed weeks instead.</p>
+            
+            </div><div class="result-card" style="margin-bottom: 1rem;">
+            <div class="result-header">
+                <h3 class="result-title"><span class="open-league-view" data-league-id="demo_std_2026" style="cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px;" title="Open full league view — standings, records, rosters and draft picks">Waiver Wire Wednesday</span></h3>
+            </div>
+            
+                <div style="margin: 0.6rem 0 0.2rem; padding: 0.5rem 0.7rem; background: var(--bg-main); border-left: 3px solid var(--status-green); border-radius: 0.3rem;">
+                    <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+                        <span style="font-weight: 700; color: var(--status-green); font-size: 0.85rem;">CONTENDER</span>
+                        <span style="font-weight: 700; font-size: 0.95rem;">80% sim playoff rate</span>
+                        
+                        <span class="sim-explainer-btn" style="cursor: help; color: var(--accent-blue); font-weight: 700; border: 1px solid var(--accent-blue); border-radius: 50%; width: 1.05rem; height: 1.05rem; display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;" title="NOT a prediction. This is how often this roster reached the playoffs across 5,000 simulated seasons, assuming every manager starts their best available lineup each week. It does NOT model trades, waivers, or specific injuries. Depth-adjusted mode approximates general availability risk by randomly making players unavailable and rebuilding the lineup from who's left — it measures how concentrated your production is, not who will actually get hurt.">i</span>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">Live and worth real attention — waivers and trades matter here.</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.35rem; font-size: 0.8rem;">
+                        <span style="color: var(--text-muted);">Depth-adjusted:</span>
+                        <strong>79%</strong>
+                        <span style="color: var(--status-green); font-weight: 700;">RESILIENT (−0 pts)</span>
+                        <span style="color: var(--text-muted);">Holds up well even when someone misses time.</span>
+                    </div>
+                </div>
+            <div style="margin-top: 0.5rem;"><button class="pr-detail-btn" data-league-id="demo_std_2026" style="background: transparent; border: 1px solid var(--status-green); color: var(--status-green); font-weight: 600; font-size: 0.78rem; padding: 0.3rem 0.75rem; border-radius: 0.4rem; cursor: pointer;">Detailed view →</button></div>
+            
+                <div style="margin: 0.5rem 0 0.2rem; padding: 0.5rem 0.7rem; background: var(--bg-main); border-left: 3px solid var(--accent-blue); border-radius: 0.3rem; font-size: 0.8rem;">
+                    <div style="color: var(--text-muted);">
+                        Win this week → <strong style="color: var(--status-green);">90%</strong> · Lose → <strong style="color: var(--status-red);">61%</strong> <span style="color: var(--text-muted);">(swings +29.5%)</span>.
+                    </div>
+                    <div style="color: var(--text-muted); margin-top: 0.2rem;">Lineup is already worth ~all it can be this week.</div>
+                </div>
+            
+            <div style="margin-top: 0.3rem; font-size: 0.78rem; color: var(--text-muted);">Most concentrated at <strong>K</strong> — losing your best one costs 7.0 pts/wk. That's where depth would help most.</div>
+            <div style="margin-top: 0.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; flex-wrap: wrap; gap: 0.4rem; background: rgba(34,197,94,0.06);">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; min-width: 0;">
+                        <span style="color: var(--text-muted); font-weight: 700; width: 1.3rem; text-align: right;">1.</span>
+                        <span class="standings-team-link" style="font-weight: 700; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px;">Two Minute Warning (demo_manager) <span style="font-size:0.7rem; color: var(--status-green);">(you)</span></span>
+                    </div>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <span style="color: var(--text-muted);" title="Actual record right now">6-3</span>
+                        <span style="font-weight: 600; width: 5rem; text-align: right;" title="Projected final record (expected wins, fractional on purpose)">8.6-5.4</span>
+                        <span style="font-weight: 700; width: 3.2rem; text-align: right; color: var(--status-green);">80%</span>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; flex-wrap: wrap; gap: 0.4rem; ">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; min-width: 0;">
+                        <span style="color: var(--text-muted); font-weight: 700; width: 1.3rem; text-align: right;">2.</span>
+                        <span class="standings-team-link" style="font-weight: 600; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px;">Kupp Of Joe (darius)</span>
+                    </div>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <span style="color: var(--text-muted);" title="Actual record right now">6-3</span>
+                        <span style="font-weight: 600; width: 5rem; text-align: right;" title="Projected final record (expected wins, fractional on purpose)">8.6-5.4</span>
+                        <span style="font-weight: 700; width: 3.2rem; text-align: right; color: var(--status-green);">77%</span>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; flex-wrap: wrap; gap: 0.4rem; ">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; min-width: 0;">
+                        <span style="color: var(--text-muted); font-weight: 700; width: 1.3rem; text-align: right;">3.</span>
+                        <span class="standings-team-link" style="font-weight: 600; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px;">Pass The Aux (reggie)</span>
+                    </div>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <span style="color: var(--text-muted);" title="Actual record right now">5-4</span>
+                        <span style="font-weight: 600; width: 5rem; text-align: right;" title="Projected final record (expected wins, fractional on purpose)">7.6-6.4</span>
+                        <span style="font-weight: 700; width: 3.2rem; text-align: right; color: var(--status-green);">65%</span>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; flex-wrap: wrap; gap: 0.4rem; ">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; min-width: 0;">
+                        <span style="color: var(--text-muted); font-weight: 700; width: 1.3rem; text-align: right;">4.</span>
+                        <span class="standings-team-link" style="font-weight: 600; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px;">Bench Warmers Union (ty_b)</span>
+                    </div>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <span style="color: var(--text-muted);" title="Actual record right now">5-4</span>
+                        <span style="font-weight: 600; width: 5rem; text-align: right;" title="Projected final record (expected wins, fractional on purpose)">7.6-6.4</span>
+                        <span style="font-weight: 700; width: 3.2rem; text-align: right; color: var(--status-green);">59%</span>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; flex-wrap: wrap; gap: 0.4rem; ">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; min-width: 0;">
+                        <span style="color: var(--text-muted); font-weight: 700; width: 1.3rem; text-align: right;">5.</span>
+                        <span class="standings-team-link" style="font-weight: 600; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px;">Third And Long Island (sofia.m)</span>
+                    </div>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <span style="color: var(--text-muted);" title="Actual record right now">4-5</span>
+                        <span style="font-weight: 600; width: 5rem; text-align: right;" title="Projected final record (expected wins, fractional on purpose)">6.9-7.1</span>
+                        <span style="font-weight: 700; width: 3.2rem; text-align: right; color: var(--status-yellow);">50%</span>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; flex-wrap: wrap; gap: 0.4rem; ">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; min-width: 0;">
+                        <span style="color: var(--text-muted); font-weight: 700; width: 1.3rem; text-align: right;">6.</span>
+                        <span class="standings-team-link" style="font-weight: 600; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px;">Puka Yourself (anand)</span>
+                    </div>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <span style="color: var(--text-muted);" title="Actual record right now">5-4</span>
+                        <span style="font-weight: 600; width: 5rem; text-align: right;" title="Projected final record (expected wins, fractional on purpose)">7.4-6.6</span>
+                        <span style="font-weight: 700; width: 3.2rem; text-align: right; color: var(--status-yellow);">42%</span>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; flex-wrap: wrap; gap: 0.4rem; ">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; min-width: 0;">
+                        <span style="color: var(--text-muted); font-weight: 700; width: 1.3rem; text-align: right;">7.</span>
+                        <span class="standings-team-link" style="font-weight: 600; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px;">Flexual Healing (quinn_d)</span>
+                    </div>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <span style="color: var(--text-muted);" title="Actual record right now">4-5</span>
+                        <span style="font-weight: 600; width: 5rem; text-align: right;" title="Projected final record (expected wins, fractional on purpose)">6.2-7.8</span>
+                        <span style="font-weight: 700; width: 3.2rem; text-align: right; color: var(--status-red);">15%</span>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; flex-wrap: wrap; gap: 0.4rem; ">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; min-width: 0;">
+                        <span style="color: var(--text-muted); font-weight: 700; width: 1.3rem; text-align: right;">8.</span>
+                        <span class="standings-team-link" style="font-weight: 600; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px;">Two Tight Ends (jessie.r)</span>
+                    </div>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <span style="color: var(--text-muted);" title="Actual record right now">3-6</span>
+                        <span style="font-weight: 600; width: 5rem; text-align: right;" title="Projected final record (expected wins, fractional on purpose)">5.4-8.6</span>
+                        <span style="font-weight: 700; width: 3.2rem; text-align: right; color: var(--status-red);">5%</span>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; flex-wrap: wrap; gap: 0.4rem; ">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; min-width: 0;">
+                        <span style="color: var(--text-muted); font-weight: 700; width: 1.3rem; text-align: right;">9.</span>
+                        <span class="standings-team-link" style="font-weight: 600; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px;">Scary Terry Cloth (leah.v)</span>
+                    </div>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <span style="color: var(--text-muted);" title="Actual record right now">3-6</span>
+                        <span style="font-weight: 600; width: 5rem; text-align: right;" title="Projected final record (expected wins, fractional on purpose)">5.1-8.9</span>
+                        <span style="font-weight: 700; width: 3.2rem; text-align: right; color: var(--status-red);">4%</span>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; flex-wrap: wrap; gap: 0.4rem; ">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; min-width: 0;">
+                        <span style="color: var(--text-muted); font-weight: 700; width: 1.3rem; text-align: right;">10.</span>
+                        <span class="standings-team-link" style="font-weight: 600; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px;">Mixon It Up (hana_l)</span>
+                    </div>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <span style="color: var(--text-muted);" title="Actual record right now">3-6</span>
+                        <span style="font-weight: 600; width: 5rem; text-align: right;" title="Projected final record (expected wins, fractional on purpose)">5.6-8.4</span>
+                        <span style="font-weight: 700; width: 3.2rem; text-align: right; color: var(--status-red);">4%</span>
+                    </div>
+                </div></div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.5rem 0 0; font-style: italic;">Weeks 10–14 simulated assuming BOTH teams start their best lineup, top 4 make playoffs. Projected records are expected wins (a 55% game counts as 0.55, not a win) and further-out weeks are weighted closer to a coin flip, since projections that far ahead can't know about injuries or trades yet.</p>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0.3rem 0 0;">Remaining schedule: about league average.</p>
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0.35rem 0 0;">σ ≈ 35.0 pts — derived from this league's own scoring rules and lineup shape (TD-heavy and superflex formats are noisier; PPR is calmer). Tick "Calibrate from past results" to measure it from real completed weeks instead.</p>
+            
+            </div>
+<div id="pr-detail-modal" class="result-card" style="display: none; border-color: var(--status-green); margin-bottom: 1rem;">
+        <div  style="max-width: 900px;">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 0;">
+                    <h2 id="pr-detail-title" style="margin: 0; color: var(--status-green);">League Detail</h2>
+                    <div id="pr-detail-subtitle" style="margin-top: 0.35rem; font-size: 0.75rem; color: var(--text-muted);"></div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <label for="pr-detail-team-select" style="font-size: 0.8rem; color: var(--text-muted); white-space: nowrap;">Viewing:</label>
+                        <select id="pr-detail-team-select" style="padding: 0.3rem 0.5rem; font-size: 0.85rem; border: 1px solid var(--border-color); border-radius: 0.3rem; background: var(--bg-main); color: var(--text-main); cursor: pointer;">
+                            <!-- Options populated dynamically -->
+                        </select>
+                    </div>
+                    <div id="pr-detail-mode-toggle-container"></div>
+                    <button id="close-pr-detail-btn" style="background: transparent; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); padding: 0;">×</button>
+                </div>
+            </div>
+            <div class="card-body" style="max-height: 72vh; overflow-y: auto;">
+                <div id="pr-detail-content"></div>
+                <!-- Mounted once per modal open by openPowerRankingDetail.
+                     Kept OUT of #pr-detail-content because that element is
+                     wholly re-rendered on every team/mode switch, and because
+                     its markup is serialized into the standalone HTML export
+                     where the trade engine does not exist. -->
+                <div id="pr-detail-trade-sim"></div>
+            </div>
+        </div>
+    </div>
+<div id="pr-slot-modal" class="modal-overlay" style="z-index: 60;">
+        <div class="modal-content card" style="max-width: 760px;">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 0;">
+                    <h2 id="pr-slot-title" style="margin: 0; color: var(--accent-blue);">Starting slots</h2>
+                    <div id="pr-slot-subtitle" style="margin-top: 0.35rem; font-size: 0.75rem; color: var(--text-muted);"></div>
+                </div>
+                <button id="pr-slot-close" style="background: transparent; border: none; color: var(--text-muted); font-size: 1.6rem; line-height: 1; cursor: pointer; padding: 0 0.25rem;">×</button>
+            </div>
+            <div class="modal-scroll-area" style="padding: 1rem 1.25rem 1.25rem;">
+                <div id="pr-slot-content"></div>
+            </div>
+        </div>
+    </div>
+<script>
+            window.__prDetail = {"demo_sf_2026":{"paths":{"bands":[{"week":0,"p10":6,"p25":6,"p50":6,"p75":6,"p90":7},{"week":1,"p10":6,"p25":6,"p50":7,"p75":7,"p90":8},{"week":2,"p10":6,"p25":7,"p50":7,"p75":8,"p90":8},{"week":3,"p10":7,"p25":7,"p50":8,"p75":9,"p90":9},{"week":4,"p10":7,"p25":7,"p50":8,"p75":9,"p90":10}],"samples":[[6,7,8,8,9],[6,7,7,7,7],[6,6,6,6,7],[7,7,8,9,10],[6,6,7,7,7],[6,7,7,7,7],[7,7,7,7,8],[6,6,7,8,8],[6,6,6,7,7],[7,7,8,9,9],[7,7,8,9,10],[6,6,7,7,8],[6,7,7,8,8],[6,6,7,8,8],[6,7,8,9,9],[6,7,8,8,9],[6,7,7,7,7],[6,6,7,8,8],[6,6,7,8,8],[7,7,7,8,9],[6,7,7,8,8],[6,6,7,7,7],[6,7,8,8,9],[7,8,9,10,11],[6,7,7,8,9],[6,7,7,8,8],[6,6,7,8,8],[7,7,8,8,8],[6,6,6,7,8],[6,6,7,8,9],[6,7,7,7,8],[6,6,7,8,9],[6,6,6,6,7],[6,6,7,8,8],[6,7,7,8,8],[6,7,7,8,9],[6,7,8,9,9],[6,6,6,6,6],[6,7,7,8,9],[6,7,7,8,8]],"startWins":6,"cutWins":8},"depthPaths":{"bands":[{"week":0,"p10":6,"p25":6,"p50":6,"p75":6,"p90":7},{"week":1,"p10":6,"p25":6,"p50":7,"p75":7,"p90":8},{"week":2,"p10":6,"p25":7,"p50":7,"p75":8,"p90":8},{"week":3,"p10":7,"p25":7,"p50":8,"p75":9,"p90":9},{"week":4,"p10":7,"p25":7,"p50":8,"p75":9,"p90":10}],"samples":[[6,6,7,8,9],[6,6,6,6,6],[6,6,7,7,7],[6,6,6,7,8],[7,7,8,9,10],[6,6,7,8,9],[6,6,6,7,7],[7,7,7,8,8],[6,6,6,6,6],[6,7,7,7,7],[6,6,6,7,8],[6,7,7,7,7],[6,7,8,9,9],[7,7,7,8,8],[6,7,7,7,7],[6,6,6,7,7],[6,7,7,8,8],[6,6,6,6,6],[7,8,8,9,10],[6,7,7,7,7],[6,6,6,7,7],[7,8,8,9,9],[7,8,9,10,11],[7,8,9,9,9],[7,7,8,8,8],[7,8,8,9,9],[7,8,9,10,10],[6,6,7,7,7],[6,6,7,8,8],[6,7,8,9,9],[7,7,7,8,8],[6,6,6,6,7],[6,7,7,8,9],[6,6,6,7,8],[6,6,6,7,7],[6,7,8,8,8],[7,7,7,8,8],[6,6,7,8,8],[6,7,7,7,8],[6,7,8,8,9]],"startWins":6,"cutWins":8},"leagueName":"Sunday Scaries Superflex","myRosterId":6,"playoffTeams":6,"startWeek":10,"lastRegularWeek":14,"usedDepthModel":true,"teams":[{"rosterId":1,"name":"Bijan Mustard (mikez)","teamName":"Bijan Mustard","manager":"mikez","playoffOdds":0.3722,"byeOdds":0.0848,"depthPlayoffOdds":0.321,"simExpectedWins":7.014,"actualWins":4,"actualLosses":5,"actualTies":0,"actualPts":977.75,"projWins":3.010500494661435,"projLosses":1.9894995053385653,"projTies":0,"projPts":671.4499999999999,"oppSum":622.088,"oppCount":5,"winDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0.0088},{"wins":5,"pct":0.0684},{"wins":6,"pct":0.2344},{"wins":7,"pct":0.3514},{"wins":8,"pct":0.2624},{"wins":9,"pct":0.0746}],"depthWinDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0.015},{"wins":5,"pct":0.1045},{"wins":6,"pct":0.245},{"wins":7,"pct":0.3475},{"wins":8,"pct":0.2165},{"wins":9,"pct":0.0715}],"positional":{"total":671.4499999999999,"byPos":{"QB":{"pos":"QB","pts":103.778,"count":5,"slots":1,"top":[{"id":"p1000","pts":103.778}]},"RB":{"pos":"RB","pts":139.97,"count":10,"slots":2,"top":[{"id":"p1024","pts":80.73},{"id":"p1048","pts":48.33}]},"WR":{"pos":"WR","pts":186.99,"count":15,"slots":3,"top":[{"id":"p1066","pts":76.99000000000001},{"id":"p1089","pts":61.370000000000005},{"id":"p1090","pts":41.56}]},"TE":{"pos":"TE","pts":59.5,"count":5,"slots":1,"top":[{"id":"p1120","pts":59.5}]},"K":{"pos":"K","pts":53.800000000000004,"count":5,"slots":1,"top":[{"id":"p1144","pts":53.800000000000004}]},"DEF":{"pos":"DEF","pts":18.200000000000003,"count":5,"slots":1,"top":[{"id":"DEN","pts":18.200000000000003}]},"FLEX":{"pos":"FLEX","pts":46.190000000000005,"count":5,"slots":1,"top":[{"id":"p1047","pts":37.300000000000004}]},"SUPER_FLEX":{"pos":"SUPER_FLEX","pts":63.022,"count":5,"slots":1,"top":[{"id":"p1023","pts":63.022}]}}},"depthPositional":{"total":597.8372229999982,"byPos":{"QB":{"pos":"QB","pts":93.62066099999964,"count":9685},"RB":{"pos":"RB","pts":127.31366499999834,"count":19059},"WR":{"pos":"WR","pts":172.00591499999385,"count":29942},"TE":{"pos":"TE","pts":53.63747999999501,"count":10000},"K":{"pos":"K","pts":44.430549999998696,"count":8278},"FLEX":{"pos":"FLEX","pts":39.861704999997805,"count":9943},"SUPER_FLEX":{"pos":"SUPER_FLEX","pts":51.95784699999959,"count":9752},"DEF":{"pos":"DEF","pts":15.009400000000477,"count":8225}}}},{"rosterId":2,"name":"Nix Please (jordan_p)","teamName":"Nix Please","manager":"jordan_p","playoffOdds":0.348,"byeOdds":0.056,"depthPlayoffOdds":0.3315,"simExpectedWins":6.8518,"actualWins":4,"actualLosses":5,"actualTies":0,"actualPts":1003.43,"projWins":2.8728420623788558,"projLosses":2.1271579376211442,"projTies":0,"projPts":668.874,"oppSum":634.016,"oppCount":5,"winDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0.0104},{"wins":5,"pct":0.0844},{"wins":6,"pct":0.2602},{"wins":7,"pct":0.3774},{"wins":8,"pct":0.2232},{"wins":9,"pct":0.0444}],"depthWinDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0.012},{"wins":5,"pct":0.1025},{"wins":6,"pct":0.272},{"wins":7,"pct":0.3455},{"wins":8,"pct":0.2085},{"wins":9,"pct":0.0595}],"positional":{"total":668.874,"byPos":{"QB":{"pos":"QB","pts":100.34,"count":5,"slots":1,"top":[{"id":"p1001","pts":100.34}]},"RB":{"pos":"RB","pts":142.47,"count":10,"slots":2,"top":[{"id":"p1025","pts":83.79},{"id":"p1049","pts":33.71}]},"WR":{"pos":"WR","pts":186.74,"count":15,"slots":3,"top":[{"id":"p1067","pts":75.85},{"id":"p1088","pts":58.7},{"id":"p1091","pts":52.19000000000001}]},"TE":{"pos":"TE","pts":56.61000000000001,"count":5,"slots":1,"top":[{"id":"p1121","pts":56.61000000000001}]},"K":{"pos":"K","pts":51.5,"count":5,"slots":1,"top":[{"id":"p1145","pts":51.5}]},"DEF":{"pos":"DEF","pts":20.200000000000003,"count":5,"slots":1,"top":[{"id":"HOU","pts":20.200000000000003}]},"FLEX":{"pos":"FLEX","pts":48.510000000000005,"count":5,"slots":1,"top":[{"id":"p1046","pts":28.240000000000002}]},"SUPER_FLEX":{"pos":"SUPER_FLEX","pts":62.504000000000005,"count":5,"slots":1,"top":[{"id":"p1022","pts":62.504000000000005}]}}},"depthPositional":{"total":600.7104399999962,"byPos":{"QB":{"pos":"QB","pts":92.3282430000033,"count":9651},"RB":{"pos":"RB","pts":129.8875699999999,"count":19041},"WR":{"pos":"WR","pts":173.92480000000674,"count":29934},"TE":{"pos":"TE","pts":51.07158499999753,"count":10000},"K":{"pos":"K","pts":42.40955000000211,"count":8309},"DEF":{"pos":"DEF","pts":17.257299999998885,"count":8423},"FLEX":{"pos":"FLEX","pts":42.38986999999999,"count":9925},"SUPER_FLEX":{"pos":"SUPER_FLEX","pts":51.441522000002294,"count":9763}}}},{"rosterId":3,"name":"Hurts So Good (tayl0r)","teamName":"Hurts So Good","manager":"tayl0r","playoffOdds":0.773,"byeOdds":0.352,"depthPlayoffOdds":0.7075,"simExpectedWins":8.3536,"actualWins":5,"actualLosses":4,"actualTies":0,"actualPts":917.62,"projWins":3.354454844018237,"projLosses":1.645545155981763,"projTies":0,"projPts":683.0999999999999,"oppSum":597.888,"oppCount":5,"winDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0},{"wins":5,"pct":0.0032},{"wins":6,"pct":0.0338},{"wins":7,"pct":0.16},{"wins":8,"pct":0.3352},{"wins":9,"pct":0.3448},{"wins":10,"pct":0.123}],"depthWinDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0},{"wins":5,"pct":0.0045},{"wins":6,"pct":0.0645},{"wins":7,"pct":0.1885},{"wins":8,"pct":0.3375},{"wins":9,"pct":0.305},{"wins":10,"pct":0.1}],"positional":{"total":683.0999999999999,"byPos":{"QB":{"pos":"QB","pts":104.14600000000002,"count":5,"slots":1,"top":[{"id":"p1002","pts":104.14600000000002}]},"RB":{"pos":"RB","pts":144.48999999999998,"count":10,"slots":2,"top":[{"id":"p1026","pts":84.10000000000001},{"id":"p1050","pts":35.910000000000004}]},"WR":{"pos":"WR","pts":186.8,"count":15,"slots":3,"top":[{"id":"p1068","pts":78.97999999999999},{"id":"p1087","pts":59.01},{"id":"p1092","pts":48.81}]},"TE":{"pos":"TE","pts":53.900000000000006,"count":5,"slots":1,"top":[{"id":"p1122","pts":53.900000000000006}]},"K":{"pos":"K","pts":54.3,"count":5,"slots":1,"top":[{"id":"p1146","pts":54.3}]},"DEF":{"pos":"DEF","pts":21.5,"count":5,"slots":1,"top":[{"id":"MIN","pts":21.5}]},"FLEX":{"pos":"FLEX","pts":51.61999999999999,"count":5,"slots":1,"top":[{"id":"p1045","pts":30.879999999999995}]},"SUPER_FLEX":{"pos":"SUPER_FLEX","pts":66.344,"count":5,"slots":1,"top":[{"id":"p1021","pts":66.344}]}}},"depthPositional":{"total":610.0607350000014,"byPos":{"QB":{"pos":"QB","pts":95.72881999999326,"count":9686},"RB":{"pos":"RB","pts":132.93078500001775,"count":19143},"WR":{"pos":"WR","pts":171.79006000000055,"count":29930},"TE":{"pos":"TE","pts":49.414039999999346,"count":10000},"K":{"pos":"K","pts":44.8481500000011,"count":8220},"DEF":{"pos":"DEF","pts":17.670850000000016,"count":8228},"FLEX":{"pos":"FLEX","pts":43.42821000000207,"count":9932},"SUPER_FLEX":{"pos":"SUPER_FLEX","pts":54.2498199999991,"count":9748}}}},{"rosterId":4,"name":"Kittle Caesars (rachael.q)","teamName":"Kittle Caesars","manager":"rachael.q","playoffOdds":0.1792,"byeOdds":0.023,"depthPlayoffOdds":0.1725,"simExpectedWins":6.4848,"actualWins":4,"actualLosses":5,"actualTies":0,"actualPts":951.42,"projWins":2.4652190223966364,"projLosses":2.5347809776033636,"projTies":0,"projPts":654.502,"oppSum":656.612,"oppCount":5,"winDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0.0274},{"wins":5,"pct":0.1566},{"wins":6,"pct":0.3258},{"wins":7,"pct":0.3108},{"wins":8,"pct":0.1528},{"wins":9,"pct":0.0266}],"depthWinDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0.036},{"wins":5,"pct":0.1705},{"wins":6,"pct":0.316},{"wins":7,"pct":0.3055},{"wins":8,"pct":0.1465},{"wins":9,"pct":0.0255}],"positional":{"total":654.502,"byPos":{"QB":{"pos":"QB","pts":102.968,"count":5,"slots":1,"top":[{"id":"p1003","pts":102.968}]},"RB":{"pos":"RB","pts":137.2,"count":10,"slots":2,"top":[{"id":"p1027","pts":79.29},{"id":"p1051","pts":43.69}]},"WR":{"pos":"WR","pts":191.32,"count":15,"slots":3,"top":[{"id":"p1069","pts":74.4},{"id":"p1086","pts":66.29},{"id":"p1093","pts":50.629999999999995}]},"TE":{"pos":"TE","pts":44.02,"count":5,"slots":1,"top":[{"id":"p1123","pts":44.02}]},"K":{"pos":"K","pts":41.300000000000004,"count":5,"slots":1,"top":[{"id":"p1147","pts":41.300000000000004}]},"DEF":{"pos":"DEF","pts":22.2,"count":5,"slots":1,"top":[{"id":"PHI","pts":22.2}]},"FLEX":{"pos":"FLEX","pts":54.99,"count":5,"slots":1,"top":[{"id":"p1044","pts":32.66}]},"SUPER_FLEX":{"pos":"SUPER_FLEX","pts":60.504000000000005,"count":5,"slots":1,"top":[{"id":"p1020","pts":60.504000000000005}]}}},"depthPositional":{"total":585.7591040000101,"byPos":{"QB":{"pos":"QB","pts":92.58486800000117,"count":9647},"RB":{"pos":"RB","pts":127.76836499999952,"count":19200},"WR":{"pos":"WR","pts":176.62167500000163,"count":29954},"TE":{"pos":"TE","pts":40.54153499999999,"count":10000},"DEF":{"pos":"DEF","pts":18.23069999999912,"count":8238},"FLEX":{"pos":"FLEX","pts":45.19449999999997,"count":9921},"SUPER_FLEX":{"pos":"SUPER_FLEX","pts":50.61526099999885,"count":9725},"K":{"pos":"K","pts":34.202200000001135,"count":8270}}}},{"rosterId":5,"name":"The Bowers That Be (sam_h)","teamName":"The Bowers That Be","manager":"sam_h","playoffOdds":0.865,"byeOdds":0.4942,"depthPlayoffOdds":0.8295,"simExpectedWins":8.9562,"actualWins":6,"actualLosses":3,"actualTies":0,"actualPts":943.71,"projWins":2.9672411895788784,"projLosses":2.0327588104211216,"projTies":0,"projPts":650.4620000000001,"oppSum":606.202,"oppCount":5,"winDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0},{"wins":5,"pct":0},{"wins":6,"pct":0.0108},{"wins":7,"pct":0.0814},{"wins":8,"pct":0.2434},{"wins":9,"pct":0.337},{"wins":10,"pct":0.26},{"wins":11,"pct":0.0674}],"depthWinDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0},{"wins":5,"pct":0},{"wins":6,"pct":0.02},{"wins":7,"pct":0.0985},{"wins":8,"pct":0.2655},{"wins":9,"pct":0.3275},{"wins":10,"pct":0.222},{"wins":11,"pct":0.0665}],"positional":{"total":650.4620000000001,"byPos":{"QB":{"pos":"QB","pts":112.93200000000002,"count":5,"slots":1,"top":[{"id":"p1004","pts":112.93200000000002}]},"RB":{"pos":"RB","pts":139.06,"count":10,"slots":2,"top":[{"id":"p1028","pts":78.95},{"id":"p1052","pts":36.45}]},"WR":{"pos":"WR","pts":185.01000000000002,"count":15,"slots":3,"top":[{"id":"p1070","pts":74.95000000000002},{"id":"p1085","pts":63.03000000000001},{"id":"p1094","pts":47.03}]},"TE":{"pos":"TE","pts":43.92,"count":5,"slots":1,"top":[{"id":"p1124","pts":43.92}]},"K":{"pos":"K","pts":40.6,"count":5,"slots":1,"top":[{"id":"p1148","pts":40.6}]},"DEF":{"pos":"DEF","pts":16.4,"count":5,"slots":1,"top":[{"id":"BAL","pts":16.4}]},"FLEX":{"pos":"FLEX","pts":50.75,"count":5,"slots":1,"top":[{"id":"p1043","pts":29.5}]},"SUPER_FLEX":{"pos":"SUPER_FLEX","pts":61.790000000000006,"count":5,"slots":1,"top":[{"id":"p1019","pts":61.790000000000006}]}}},"depthPositional":{"total":582.6090330000022,"byPos":{"QB":{"pos":"QB","pts":100.87648699999684,"count":9685},"RB":{"pos":"RB","pts":127.8408600000026,"count":19088},"WR":{"pos":"WR","pts":171.53502500000025,"count":29949},"TE":{"pos":"TE","pts":40.60550000000151,"count":10000},"K":{"pos":"K","pts":33.31349999999928,"count":8220},"DEF":{"pos":"DEF","pts":13.62215000000077,"count":8259},"FLEX":{"pos":"FLEX","pts":43.422655000000105,"count":9925},"SUPER_FLEX":{"pos":"SUPER_FLEX","pts":51.39285599999867,"count":9720}}}},{"rosterId":6,"name":"Chase Manhattan (demo_manager)","teamName":"Chase Manhattan","manager":"demo_manager","playoffOdds":0.6142,"byeOdds":0.1974,"depthPlayoffOdds":0.606,"simExpectedWins":8.2234,"actualWins":6,"actualLosses":3,"actualTies":0,"actualPts":900.66,"projWins":2.2150383670272706,"projLosses":2.7849616329727294,"projTies":0,"projPts":629.13,"oppSum":656.0320000000002,"oppCount":5,"winDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0},{"wins":5,"pct":0},{"wins":6,"pct":0.04},{"wins":7,"pct":0.2144},{"wins":8,"pct":0.3544},{"wins":9,"pct":0.275},{"wins":10,"pct":0.1058},{"wins":11,"pct":0.0104}],"depthWinDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0},{"wins":5,"pct":0},{"wins":6,"pct":0.0485},{"wins":7,"pct":0.2125},{"wins":8,"pct":0.331},{"wins":9,"pct":0.2805},{"wins":10,"pct":0.112},{"wins":11,"pct":0.0155}],"positional":{"total":629.13,"byPos":{"QB":{"pos":"QB","pts":97.912,"count":5,"slots":1,"top":[{"id":"p1005","pts":97.912}]},"RB":{"pos":"RB","pts":130.38,"count":10,"slots":2,"top":[{"id":"p1029","pts":74.98},{"id":"p1042","pts":30.599999999999998}]},"WR":{"pos":"WR","pts":190.41,"count":15,"slots":3,"top":[{"id":"p1071","pts":76.61},{"id":"p1084","pts":60.77},{"id":"p1095","pts":53.029999999999994}]},"TE":{"pos":"TE","pts":44.79,"count":5,"slots":1,"top":[{"id":"p1125","pts":44.79}]},"K":{"pos":"K","pts":42.7,"count":5,"slots":1,"top":[{"id":"p1149","pts":42.7}]},"DEF":{"pos":"DEF","pts":16.3,"count":5,"slots":1,"top":[{"id":"BUF","pts":16.3}]},"FLEX":{"pos":"FLEX","pts":49.660000000000004,"count":5,"slots":1,"top":[{"id":"p1053","pts":28.16}]},"SUPER_FLEX":{"pos":"SUPER_FLEX","pts":56.977999999999994,"count":5,"slots":1,"top":[{"id":"p1018","pts":56.977999999999994}]}}},"depthPositional":{"total":565.8066370000031,"byPos":{"QB":{"pos":"QB","pts":88.94387300000194,"count":9660},"RB":{"pos":"RB","pts":120.33376500000145,"count":19104},"WR":{"pos":"WR","pts":176.256270000001,"count":29941},"TE":{"pos":"TE","pts":40.94924000000053,"count":10000},"DEF":{"pos":"DEF","pts":13.549950000000049,"count":8304},"FLEX":{"pos":"FLEX","pts":42.29493500000059,"count":9938},"SUPER_FLEX":{"pos":"SUPER_FLEX","pts":48.112604000001475,"count":9751},"K":{"pos":"K","pts":35.365999999999055,"count":8280}}}},{"rosterId":7,"name":"Saquon Barklily (nate99)","teamName":"Saquon Barklily","manager":"nate99","playoffOdds":0.3432,"byeOdds":0.0498,"depthPlayoffOdds":0.343,"simExpectedWins":7.2964,"actualWins":5,"actualLosses":4,"actualTies":0,"actualPts":931.72,"projWins":2.3102735779760732,"projLosses":2.689726422023927,"projTies":0,"projPts":632.008,"oppSum":649.332,"oppCount":5,"winDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0},{"wins":5,"pct":0.0352},{"wins":6,"pct":0.1876},{"wins":7,"pct":0.3608},{"wins":8,"pct":0.2934},{"wins":9,"pct":0.108},{"wins":10,"pct":0.015}],"depthWinDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0},{"wins":5,"pct":0.0435},{"wins":6,"pct":0.198},{"wins":7,"pct":0.333},{"wins":8,"pct":0.28},{"wins":9,"pct":0.123},{"wins":10,"pct":0.0225}],"positional":{"total":632.008,"byPos":{"QB":{"pos":"QB","pts":85.696,"count":5,"slots":1,"top":[{"id":"p1006","pts":85.696}]},"RB":{"pos":"RB","pts":147.02,"count":10,"slots":2,"top":[{"id":"p1030","pts":88.12},{"id":"p1041","pts":33.24}]},"WR":{"pos":"WR","pts":181.6,"count":15,"slots":3,"top":[{"id":"p1072","pts":73.84},{"id":"p1083","pts":60.84},{"id":"p1096","pts":46.92000000000001}]},"TE":{"pos":"TE","pts":44.75000000000001,"count":5,"slots":1,"top":[{"id":"p1126","pts":44.75000000000001}]},"K":{"pos":"K","pts":46.5,"count":5,"slots":1,"top":[{"id":"p1150","pts":46.5}]},"DEF":{"pos":"DEF","pts":14.8,"count":5,"slots":1,"top":[{"id":"DET","pts":14.8}]},"FLEX":{"pos":"FLEX","pts":50.46,"count":5,"slots":1,"top":[{"id":"p1054","pts":32.050000000000004}]},"SUPER_FLEX":{"pos":"SUPER_FLEX","pts":61.181999999999995,"count":5,"slots":1,"top":[{"id":"p1017","pts":61.181999999999995}]}}},"depthPositional":{"total":569.0538579999927,"byPos":{"QB":{"pos":"QB","pts":79.55028000000421,"count":9698},"RB":{"pos":"RB","pts":137.317935000004,"count":19954},"WR":{"pos":"WR","pts":163.91881000000444,"count":29024},"TE":{"pos":"TE","pts":41.25223499999948,"count":10000},"K":{"pos":"K","pts":38.42035000000004,"count":8250},"DEF":{"pos":"DEF","pts":12.399599999999644,"count":8320},"FLEX":{"pos":"FLEX","pts":44.209504999999666,"count":9932},"SUPER_FLEX":{"pos":"SUPER_FLEX","pts":51.98514299999814,"count":9779}}}},{"rosterId":8,"name":"Collins Calling (priya.k)","teamName":"Collins Calling","manager":"priya.k","playoffOdds":0.4928,"byeOdds":0.135,"depthPlayoffOdds":0.4935,"simExpectedWins":7.5014,"actualWins":5,"actualLosses":4,"actualTies":0,"actualPts":996.46,"projWins":2.480825727265164,"projLosses":2.519174272734836,"projTies":0,"projPts":607.958,"oppSum":610.25,"oppCount":5,"winDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0},{"wins":5,"pct":0.0264},{"wins":6,"pct":0.1418},{"wins":7,"pct":0.3282},{"wins":8,"pct":0.333},{"wins":9,"pct":0.1488},{"wins":10,"pct":0.0218}],"depthWinDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0},{"wins":5,"pct":0.0425},{"wins":6,"pct":0.147},{"wins":7,"pct":0.301},{"wins":8,"pct":0.322},{"wins":9,"pct":0.1585},{"wins":10,"pct":0.029}],"positional":{"total":607.958,"byPos":{"QB":{"pos":"QB","pts":89.386,"count":5,"slots":1,"top":[{"id":"p1007","pts":89.386}]},"RB":{"pos":"RB","pts":132.97,"count":10,"slots":2,"top":[{"id":"p1031","pts":68.29},{"id":"p1040","pts":64.68}]},"WR":{"pos":"WR","pts":187.03,"count":15,"slots":3,"top":[{"id":"p1073","pts":72.74},{"id":"p1082","pts":67.83},{"id":"p1097","pts":39.31}]},"TE":{"pos":"TE","pts":47.69,"count":5,"slots":1,"top":[{"id":"p1127","pts":47.69}]},"K":{"pos":"K","pts":33,"count":5,"slots":1,"top":[{"id":"p1151","pts":33}]},"DEF":{"pos":"DEF","pts":13.499999999999998,"count":5,"slots":1,"top":[{"id":"GB","pts":13.499999999999998}]},"FLEX":{"pos":"FLEX","pts":42.95,"count":5,"slots":1,"top":[{"id":"p1064","pts":17.39}]},"SUPER_FLEX":{"pos":"SUPER_FLEX","pts":61.432,"count":5,"slots":1,"top":[{"id":"p1016","pts":61.432}]}}},"depthPositional":{"total":546.2027829999919,"byPos":{"QB":{"pos":"QB","pts":82.38053199999617,"count":9688},"RB":{"pos":"RB","pts":123.56263000001289,"count":19967},"WR":{"pos":"WR","pts":169.10248499999585,"count":29010},"TE":{"pos":"TE","pts":44.28971499999871,"count":10000},"K":{"pos":"K","pts":26.986150000002098,"count":8192},"DEF":{"pos":"DEF","pts":11.168900000000535,"count":8244},"FLEX":{"pos":"FLEX","pts":38.16113499999973,"count":9957},"SUPER_FLEX":{"pos":"SUPER_FLEX","pts":50.551236000002554,"count":9828}}}},{"rosterId":9,"name":"Nacua Matata (devin_t)","teamName":"Nacua Matata","manager":"devin_t","playoffOdds":0.5696,"byeOdds":0.2002,"depthPlayoffOdds":0.624,"simExpectedWins":7.7234,"actualWins":6,"actualLosses":3,"actualTies":0,"actualPts":1046.79,"projWins":1.7265636638012292,"projLosses":3.2734363361987704,"projTies":0,"projPts":581.32,"oppSum":656.982,"oppCount":5,"winDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0},{"wins":5,"pct":0},{"wins":6,"pct":0.117},{"wins":7,"pct":0.325},{"wins":8,"pct":0.331},{"wins":9,"pct":0.176},{"wins":10,"pct":0.0466},{"wins":11,"pct":0.0044}],"depthWinDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0},{"wins":5,"pct":0},{"wins":6,"pct":0.105},{"wins":7,"pct":0.2795},{"wins":8,"pct":0.3435},{"wins":9,"pct":0.199},{"wins":10,"pct":0.062},{"wins":11,"pct":0.011}],"positional":{"total":581.32,"byPos":{"QB":{"pos":"QB","pts":84.56799999999998,"count":5,"slots":1,"top":[{"id":"p1008","pts":84.56799999999998}]},"RB":{"pos":"RB","pts":129.01000000000002,"count":10,"slots":2,"top":[{"id":"p1039","pts":65.43},{"id":"p1032","pts":63.58}]},"WR":{"pos":"WR","pts":176.32,"count":15,"slots":3,"top":[{"id":"p1074","pts":71.69},{"id":"p1081","pts":59.31999999999999},{"id":"p1098","pts":37.7}]},"TE":{"pos":"TE","pts":36.66,"count":5,"slots":1,"top":[{"id":"p1128","pts":36.66}]},"K":{"pos":"K","pts":35.1,"count":5,"slots":1,"top":[{"id":"p1152","pts":35.1}]},"DEF":{"pos":"DEF","pts":16.3,"count":5,"slots":1,"top":[{"id":"PIT","pts":16.3}]},"FLEX":{"pos":"FLEX","pts":39.59,"count":5,"slots":1,"top":[{"id":"p1063","pts":16.6}]},"SUPER_FLEX":{"pos":"SUPER_FLEX","pts":63.772000000000006,"count":5,"slots":1,"top":[{"id":"p1015","pts":63.772000000000006}]}}},"depthPositional":{"total":524.1111820000042,"byPos":{"QB":{"pos":"QB","pts":79.17013600000024,"count":9691},"RB":{"pos":"RB","pts":119.55399000000726,"count":19974},"WR":{"pos":"WR","pts":159.759105000004,"count":29065},"TE":{"pos":"TE","pts":34.61967500000086,"count":10000},"K":{"pos":"K","pts":29.11509999999993,"count":8320},"DEF":{"pos":"DEF","pts":13.453150000000063,"count":8251},"FLEX":{"pos":"FLEX","pts":36.11243499999894,"count":9948},"SUPER_FLEX":{"pos":"SUPER_FLEX","pts":52.32759100000086,"count":9769}}}},{"rosterId":10,"name":"Hall of Shame (bex)","teamName":"Hall of Shame","manager":"bex","playoffOdds":0.3756,"byeOdds":0.0912,"depthPlayoffOdds":0.402,"simExpectedWins":7.1562,"actualWins":5,"actualLosses":4,"actualTies":0,"actualPts":1009.54,"projWins":2.139007934558977,"projLosses":2.860992065441023,"projTies":0,"projPts":598.348,"oppSum":634.356,"oppCount":5,"winDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0},{"wins":5,"pct":0.0586},{"wins":6,"pct":0.2242},{"wins":7,"pct":0.3448},{"wins":8,"pct":0.2632},{"wins":9,"pct":0.0932},{"wins":10,"pct":0.016}],"depthWinDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0},{"wins":5,"pct":0.057},{"wins":6,"pct":0.2205},{"wins":7,"pct":0.324},{"wins":8,"pct":0.274},{"wins":9,"pct":0.1075},{"wins":10,"pct":0.017}],"positional":{"total":598.348,"byPos":{"QB":{"pos":"QB","pts":91.858,"count":5,"slots":1,"top":[{"id":"p1009","pts":50.772}]},"RB":{"pos":"RB","pts":127.75,"count":10,"slots":2,"top":[{"id":"p1033","pts":65.94},{"id":"p1038","pts":61.809999999999995}]},"WR":{"pos":"WR","pts":187.33,"count":15,"slots":3,"top":[{"id":"p1075","pts":77.66},{"id":"p1080","pts":61.50000000000001},{"id":"p1099","pts":48.17}]},"TE":{"pos":"TE","pts":36.18,"count":5,"slots":1,"top":[{"id":"p1129","pts":36.18}]},"K":{"pos":"K","pts":32.6,"count":5,"slots":1,"top":[{"id":"p1153","pts":32.6}]},"DEF":{"pos":"DEF","pts":14.2,"count":5,"slots":1,"top":[{"id":"SEA","pts":14.2}]},"FLEX":{"pos":"FLEX","pts":39.18,"count":5,"slots":1,"top":[{"id":"p1062","pts":16.36}]},"SUPER_FLEX":{"pos":"SUPER_FLEX","pts":69.25,"count":5,"slots":1,"top":[{"id":"p1014","pts":45.349999999999994}]}}},"depthPositional":{"total":539.1677919999958,"byPos":{"QB":{"pos":"QB","pts":85.78542899999972,"count":9652},"RB":{"pos":"RB","pts":118.14993999999545,"count":19971},"WR":{"pos":"WR","pts":168.90915999999564,"count":28939},"TE":{"pos":"TE","pts":34.55657499999718,"count":10000},"K":{"pos":"K","pts":26.784900000001443,"count":8244},"DEF":{"pos":"DEF","pts":11.666299999999541,"count":8276},"FLEX":{"pos":"FLEX","pts":36.476104999999436,"count":9944},"SUPER_FLEX":{"pos":"SUPER_FLEX","pts":56.839383000000566,"count":9796}}}},{"rosterId":11,"name":"Purdy Good Team (olu_a)","teamName":"Purdy Good Team","manager":"olu_a","playoffOdds":0.6246,"byeOdds":0.209,"depthPlayoffOdds":0.6505,"simExpectedWins":7.409,"actualWins":5,"actualLosses":4,"actualTies":0,"actualPts":1069.8,"projWins":2.40273088497483,"projLosses":2.59726911502517,"projTies":0,"projPts":624.3199999999999,"oppSum":633.758,"oppCount":5,"winDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0},{"wins":5,"pct":0.0344},{"wins":6,"pct":0.1596},{"wins":7,"pct":0.3446},{"wins":8,"pct":0.3024},{"wins":9,"pct":0.142},{"wins":10,"pct":0.017}],"depthWinDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0},{"wins":5,"pct":0.03},{"wins":6,"pct":0.1415},{"wins":7,"pct":0.321},{"wins":8,"pct":0.3185},{"wins":9,"pct":0.1635},{"wins":10,"pct":0.0255}],"positional":{"total":624.3199999999999,"byPos":{"QB":{"pos":"QB","pts":101.99000000000001,"count":5,"slots":1,"top":[{"id":"p1013","pts":59.706}]},"RB":{"pos":"RB","pts":138.44,"count":10,"slots":2,"top":[{"id":"p1034","pts":69.66},{"id":"p1037","pts":68.78}]},"WR":{"pos":"WR","pts":180.37,"count":15,"slots":3,"top":[{"id":"p1079","pts":63.650000000000006},{"id":"p1076","pts":62.34},{"id":"p1103","pts":32}]},"TE":{"pos":"TE","pts":42.980000000000004,"count":5,"slots":1,"top":[{"id":"p1133","pts":25.84}]},"K":{"pos":"K","pts":31.700000000000003,"count":5,"slots":1,"top":[{"id":"p1154","pts":31.700000000000003}]},"DEF":{"pos":"DEF","pts":7.8,"count":5,"slots":1,"top":[{"id":"ARI","pts":7.8}]},"FLEX":{"pos":"FLEX","pts":45.32,"count":5,"slots":1,"top":[{"id":"p1100","pts":18.26}]},"SUPER_FLEX":{"pos":"SUPER_FLEX","pts":75.72,"count":5,"slots":1,"top":[{"id":"p1010","pts":48.49}]}}},"depthPositional":{"total":567.6886390000038,"byPos":{"RB":{"pos":"RB","pts":129.0751250000028,"count":19988},"WR":{"pos":"WR","pts":165.99341999999382,"count":28731},"TE":{"pos":"TE","pts":41.39829000000033,"count":10000},"K":{"pos":"K","pts":26.013050000002462,"count":8225},"DEF":{"pos":"DEF","pts":6.654850000000126,"count":8287},"FLEX":{"pos":"FLEX","pts":41.851370000002234,"count":9969},"SUPER_FLEX":{"pos":"SUPER_FLEX","pts":62.10505299999851,"count":9847},"QB":{"pos":"QB","pts":94.59748100000238,"count":9678}}}},{"rosterId":12,"name":"Gibbs Me A Break (marcus.w)","teamName":"Gibbs Me A Break","manager":"marcus.w","playoffOdds":0.4426,"byeOdds":0.1074,"depthPlayoffOdds":0.519,"simExpectedWins":7.0298,"actualWins":5,"actualLosses":4,"actualTies":0,"actualPts":1077.23,"projWins":2.055302231362414,"projLosses":2.944697768637586,"projTies":0,"projPts":598.8779999999999,"oppSum":642.834,"oppCount":5,"winDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0},{"wins":5,"pct":0.0706},{"wins":6,"pct":0.2534},{"wins":7,"pct":0.347},{"wins":8,"pct":0.2438},{"wins":9,"pct":0.075},{"wins":10,"pct":0.0102}],"depthWinDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0},{"wins":5,"pct":0.051},{"wins":6,"pct":0.2105},{"wins":7,"pct":0.3245},{"wins":8,"pct":0.281},{"wins":9,"pct":0.118},{"wins":10,"pct":0.015}],"positional":{"total":598.8779999999999,"byPos":{"QB":{"pos":"QB","pts":87.90400000000001,"count":5,"slots":1,"top":[{"id":"p1011","pts":51.406000000000006}]},"RB":{"pos":"RB","pts":130.70000000000002,"count":10,"slots":2,"top":[{"id":"p1036","pts":66.8},{"id":"p1035","pts":63.900000000000006}]},"WR":{"pos":"WR","pts":174.60000000000002,"count":15,"slots":3,"top":[{"id":"p1078","pts":62.290000000000006},{"id":"p1077","pts":59},{"id":"p1102","pts":30.120000000000005}]},"TE":{"pos":"TE","pts":40.77,"count":5,"slots":1,"top":[{"id":"p1132","pts":25.1}]},"K":{"pos":"K","pts":36,"count":5,"slots":1,"top":[{"id":"p1155","pts":36}]},"DEF":{"pos":"DEF","pts":9,"count":5,"slots":1,"top":[{"id":"CHI","pts":9}]},"FLEX":{"pos":"FLEX","pts":46.99,"count":5,"slots":1,"top":[{"id":"p1060","pts":19.04}]},"SUPER_FLEX":{"pos":"SUPER_FLEX","pts":72.914,"count":5,"slots":1,"top":[{"id":"p1012","pts":43.298}]}}},"depthPositional":{"total":548.5801670000075,"byPos":{"QB":{"pos":"QB","pts":83.25958299999988,"count":9683},"RB":{"pos":"RB","pts":122.46884499999717,"count":19987},"WR":{"pos":"WR","pts":160.43143500000411,"count":28706},"TE":{"pos":"TE","pts":40.354494999998735,"count":10000},"K":{"pos":"K","pts":29.96465000000011,"count":8294},"FLEX":{"pos":"FLEX","pts":43.640305000000325,"count":9966},"SUPER_FLEX":{"pos":"SUPER_FLEX","pts":61.129954000000495,"count":9819},"DEF":{"pos":"DEF","pts":7.330900000000025,"count":8216}}}}]},"demo_std_2026":{"paths":{"bands":[{"week":0,"p10":6,"p25":6,"p50":7,"p75":7,"p90":7},{"week":1,"p10":6,"p25":7,"p50":7,"p75":8,"p90":8},{"week":2,"p10":7,"p25":7,"p50":8,"p75":8,"p90":9},{"week":3,"p10":7,"p25":7,"p50":8,"p75":9,"p90":9},{"week":4,"p10":7,"p25":8,"p50":9,"p75":9,"p90":10}],"samples":[[7,7,7,8,9],[7,7,7,7,8],[7,8,9,10,10],[6,7,8,8,9],[7,7,7,7,8],[7,7,8,8,9],[6,6,7,8,9],[7,8,9,10,10],[6,7,7,7,8],[7,8,8,8,9],[7,7,7,8,9],[6,6,7,8,8],[6,6,6,6,6],[6,7,7,8,9],[6,7,7,7,7],[7,7,7,8,9],[7,7,8,9,9],[6,6,7,7,8],[6,6,7,8,8],[6,6,6,6,7],[6,7,8,8,8],[6,6,6,6,6],[7,7,8,8,9],[6,7,7,7,7],[7,7,8,8,8],[7,7,7,8,9],[7,7,7,7,7],[7,8,9,10,10],[7,7,8,8,8],[6,7,7,7,8],[7,8,9,9,9],[6,6,7,7,8],[6,7,8,8,8],[6,6,7,7,7],[6,7,8,8,8],[7,8,9,9,10],[7,7,7,7,8],[6,6,6,6,6],[7,8,9,9,9],[7,7,8,8,8]],"startWins":6,"cutWins":8},"depthPaths":{"bands":[{"week":0,"p10":6,"p25":6,"p50":7,"p75":7,"p90":7},{"week":1,"p10":6,"p25":7,"p50":7,"p75":8,"p90":8},{"week":2,"p10":6,"p25":7,"p50":8,"p75":8,"p90":9},{"week":3,"p10":7,"p25":7,"p50":8,"p75":9,"p90":9},{"week":4,"p10":7,"p25":8,"p50":9,"p75":9,"p90":10}],"samples":[[6,6,6,7,8],[6,6,7,7,7],[7,8,8,9,9],[6,7,8,9,10],[6,6,7,7,7],[7,7,8,8,9],[7,7,8,8,9],[7,7,7,7,7],[7,8,9,10,11],[6,6,6,6,7],[6,7,7,8,8],[6,6,6,7,7],[6,7,8,9,10],[7,7,7,8,9],[7,8,8,9,9],[7,7,8,8,9],[7,8,9,10,10],[7,7,7,7,7],[7,7,7,7,8],[7,7,8,8,9],[7,7,8,9,10],[7,7,8,9,9],[6,6,6,6,6],[7,8,8,8,8],[6,6,7,7,7],[6,6,7,7,7],[7,7,7,7,8],[7,7,8,8,9],[7,8,8,8,9],[7,8,9,10,11],[6,7,8,9,9],[6,6,6,7,8],[7,7,7,7,7],[6,7,7,8,9],[6,6,7,8,8],[7,7,7,7,7],[6,6,7,8,8],[7,7,7,8,8],[7,8,8,8,8],[7,7,7,7,8]],"startWins":6,"cutWins":8},"leagueName":"Waiver Wire Wednesday","myRosterId":5,"playoffTeams":4,"startWeek":10,"lastRegularWeek":14,"usedDepthModel":true,"teams":[{"rosterId":1,"name":"Mixon It Up (hana_l)","teamName":"Mixon It Up","manager":"hana_l","playoffOdds":0.0366,"byeOdds":null,"depthPlayoffOdds":0.021,"simExpectedWins":5.644,"actualWins":3,"actualLosses":6,"actualTies":0,"actualPts":906.23,"projWins":2.6323406053424816,"projLosses":2.367659394657518,"projTies":0,"projPts":462.446,"oppSum":451.01000000000005,"oppCount":5,"winDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0.0214},{"wins":4,"pct":0.125},{"wins":5,"pct":0.3042},{"wins":6,"pct":0.329},{"wins":7,"pct":0.1784},{"wins":8,"pct":0.042}],"depthWinDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0.0295},{"wins":4,"pct":0.1715},{"wins":5,"pct":0.3055},{"wins":6,"pct":0.3015},{"wins":7,"pct":0.1655},{"wins":8,"pct":0.0265}],"positional":{"total":462.446,"byPos":{"QB":{"pos":"QB","pts":85.696,"count":5,"slots":1,"top":[{"id":"p1006","pts":85.696}]},"RB":{"pos":"RB","pts":124.39000000000001,"count":10,"slots":2,"top":[{"id":"p1028","pts":71.8},{"id":"p1048","pts":42.93}]},"WR":{"pos":"WR","pts":106.96,"count":10,"slots":2,"top":[{"id":"p1071","pts":62.96},{"id":"p1091","pts":25.119999999999997}]},"TE":{"pos":"TE","pts":43.2,"count":5,"slots":1,"top":[{"id":"p1122","pts":43.2}]},"K":{"pos":"K","pts":41.300000000000004,"count":5,"slots":1,"top":[{"id":"p1147","pts":41.300000000000004}]},"DEF":{"pos":"DEF","pts":16.4,"count":5,"slots":1,"top":[{"id":"BAL","pts":16.4}]},"FLEX":{"pos":"FLEX","pts":44.5,"count":5,"slots":1,"top":[{"id":"p1047","pts":19.189999999999998}]}}},"depthPositional":{"total":414.1955240000111,"byPos":{"QB":{"pos":"QB","pts":70.2900790000044,"count":8204},"RB":{"pos":"RB","pts":114.90318499999836,"count":19374},"WR":{"pos":"WR","pts":101.81580500001418,"count":20000},"TE":{"pos":"TE","pts":39.282970000000496,"count":10000},"K":{"pos":"K","pts":34.028850000001135,"count":8224},"DEF":{"pos":"DEF","pts":13.774750000000791,"count":8360},"FLEX":{"pos":"FLEX","pts":40.099885000000526,"count":9999}}}},{"rosterId":2,"name":"Pass The Aux (reggie)","teamName":"Pass The Aux","manager":"reggie","playoffOdds":0.6478,"byeOdds":null,"depthPlayoffOdds":0.59,"simExpectedWins":7.6008,"actualWins":5,"actualLosses":4,"actualTies":0,"actualPts":995.32,"projWins":2.5653823249244248,"projLosses":2.4346176750755752,"projTies":0,"projPts":459.65600000000006,"oppSum":451.252,"oppCount":5,"winDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0},{"wins":5,"pct":0.0204},{"wins":6,"pct":0.1318},{"wins":7,"pct":0.3096},{"wins":8,"pct":0.3372},{"wins":9,"pct":0.1668},{"wins":10,"pct":0.0342}],"depthWinDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0},{"wins":5,"pct":0.039},{"wins":6,"pct":0.166},{"wins":7,"pct":0.3215},{"wins":8,"pct":0.3125},{"wins":9,"pct":0.1365},{"wins":10,"pct":0.0245}],"positional":{"total":459.65600000000006,"byPos":{"QB":{"pos":"QB","pts":89.386,"count":5,"slots":1,"top":[{"id":"p1007","pts":89.386}]},"RB":{"pos":"RB","pts":121.96000000000001,"count":10,"slots":2,"top":[{"id":"p1029","pts":67.93},{"id":"p1049","pts":31.46}]},"WR":{"pos":"WR","pts":112.23,"count":10,"slots":2,"top":[{"id":"p1072","pts":60.49},{"id":"p1089","pts":33.900000000000006}]},"TE":{"pos":"TE","pts":35.32,"count":5,"slots":1,"top":[{"id":"p1123","pts":35.32}]},"K":{"pos":"K","pts":40.6,"count":5,"slots":1,"top":[{"id":"p1148","pts":40.6}]},"DEF":{"pos":"DEF","pts":16.3,"count":5,"slots":1,"top":[{"id":"BUF","pts":16.3}]},"FLEX":{"pos":"FLEX","pts":43.86,"count":5,"slots":1,"top":[{"id":"p1046","pts":25.79}]}}},"depthPositional":{"total":412.58873699999987,"byPos":{"QB":{"pos":"QB","pts":73.90737199999498,"count":8300},"RB":{"pos":"RB","pts":112.42218999999893,"count":19165},"WR":{"pos":"WR","pts":106.27917000000487,"count":20000},"TE":{"pos":"TE","pts":32.3937900000003,"count":10000},"DEF":{"pos":"DEF","pts":13.487450000000052,"count":8253},"FLEX":{"pos":"FLEX","pts":40.73966499999739,"count":10000},"K":{"pos":"K","pts":33.35909999999935,"count":8229}}}},{"rosterId":3,"name":"Third And Long Island (sofia.m)","teamName":"Third And Long Island","manager":"sofia.m","playoffOdds":0.4988,"byeOdds":null,"depthPlayoffOdds":0.509,"simExpectedWins":6.9262,"actualWins":4,"actualLosses":5,"actualTies":0,"actualPts":1026.88,"projWins":2.949618421371099,"projLosses":2.0503815786289006,"projTies":0,"projPts":470.762,"oppSum":427.30800000000005,"oppCount":5,"winDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0.01},{"wins":5,"pct":0.083},{"wins":6,"pct":0.2502},{"wins":7,"pct":0.3468},{"wins":8,"pct":0.2476},{"wins":9,"pct":0.0624}],"depthWinDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0.0065},{"wins":5,"pct":0.0865},{"wins":6,"pct":0.2265},{"wins":7,"pct":0.37},{"wins":8,"pct":0.2435},{"wins":9,"pct":0.067}],"positional":{"total":470.762,"byPos":{"QB":{"pos":"QB","pts":86.392,"count":5,"slots":1,"top":[{"id":"p1008","pts":70.874}]},"RB":{"pos":"RB","pts":134.56,"count":10,"slots":2,"top":[{"id":"p1030","pts":79.62},{"id":"p1050","pts":32.36000000000001}]},"WR":{"pos":"WR","pts":110.62,"count":10,"slots":2,"top":[{"id":"p1073","pts":59.69},{"id":"p1088","pts":40.730000000000004}]},"TE":{"pos":"TE","pts":35.22,"count":5,"slots":1,"top":[{"id":"p1124","pts":35.22}]},"K":{"pos":"K","pts":42.7,"count":5,"slots":1,"top":[{"id":"p1149","pts":42.7}]},"DEF":{"pos":"DEF","pts":14.8,"count":5,"slots":1,"top":[{"id":"DET","pts":14.8}]},"FLEX":{"pos":"FLEX","pts":46.47,"count":5,"slots":1,"top":[{"id":"p1045","pts":28.08}]}}},"depthPositional":{"total":435.7079130000055,"byPos":{"QB":{"pos":"QB","pts":82.5697730000013,"count":10000},"RB":{"pos":"RB","pts":125.48679999999271,"count":19926},"WR":{"pos":"WR","pts":104.71333999999716,"count":20000},"TE":{"pos":"TE","pts":32.635359999997824,"count":10000},"K":{"pos":"K","pts":34.78434999999915,"count":8135},"DEF":{"pos":"DEF","pts":12.390249999999638,"count":8296},"FLEX":{"pos":"FLEX","pts":43.12804000000227,"count":10000}}}},{"rosterId":4,"name":"Bench Warmers Union (ty_b)","teamName":"Bench Warmers Union","manager":"ty_b","playoffOdds":0.594,"byeOdds":null,"depthPlayoffOdds":0.612,"simExpectedWins":7.5886,"actualWins":5,"actualLosses":4,"actualTies":0,"actualPts":997.78,"projWins":2.5824943019627735,"projLosses":2.417505698037226,"projTies":0,"projPts":444.23,"oppSum":436.13800000000003,"oppCount":5,"winDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0},{"wins":5,"pct":0.0226},{"wins":6,"pct":0.133},{"wins":7,"pct":0.3064},{"wins":8,"pct":0.3394},{"wins":9,"pct":0.1684},{"wins":10,"pct":0.0302}],"depthWinDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0},{"wins":5,"pct":0.024},{"wins":6,"pct":0.118},{"wins":7,"pct":0.2965},{"wins":8,"pct":0.3345},{"wins":9,"pct":0.1865},{"wins":10,"pct":0.0405}],"positional":{"total":444.23,"byPos":{"QB":{"pos":"QB","pts":75.91000000000001,"count":5,"slots":1,"top":[{"id":"p1009","pts":60.42400000000001}]},"RB":{"pos":"RB","pts":114.25000000000001,"count":10,"slots":2,"top":[{"id":"p1031","pts":62.339999999999996},{"id":"p1051","pts":39.44}]},"WR":{"pos":"WR","pts":107.35,"count":10,"slots":2,"top":[{"id":"p1074","pts":58.89},{"id":"p1087","pts":48.459999999999994}]},"TE":{"pos":"TE","pts":36.04,"count":5,"slots":1,"top":[{"id":"p1125","pts":36.04}]},"K":{"pos":"K","pts":46.5,"count":5,"slots":1,"top":[{"id":"p1150","pts":46.5}]},"DEF":{"pos":"DEF","pts":13.499999999999998,"count":5,"slots":1,"top":[{"id":"GB","pts":13.499999999999998}]},"FLEX":{"pos":"FLEX","pts":50.68000000000001,"count":5,"slots":1,"top":[{"id":"p1044","pts":28.14}]}}},"depthPositional":{"total":413.5004870000059,"byPos":{"QB":{"pos":"QB","pts":73.58908700000313,"count":10000},"RB":{"pos":"RB","pts":110.32053500000225,"count":19959},"WR":{"pos":"WR","pts":102.19295500000806,"count":20000},"TE":{"pos":"TE","pts":32.961784999999715,"count":10000},"K":{"pos":"K","pts":38.78910000000002,"count":8333},"FLEX":{"pos":"FLEX","pts":44.391724999997365,"count":10000},"DEF":{"pos":"DEF","pts":11.255300000000535,"count":8320}}}},{"rosterId":5,"name":"Two Minute Warning (demo_manager)","teamName":"Two Minute Warning","manager":"demo_manager","playoffOdds":0.7968,"byeOdds":null,"depthPlayoffOdds":0.793,"simExpectedWins":8.5768,"actualWins":6,"actualLosses":3,"actualTies":0,"actualPts":926.98,"projWins":2.591079975127063,"projLosses":2.4089200248729377,"projTies":0,"projPts":453.964,"oppSum":445.948,"oppCount":5,"winDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0},{"wins":5,"pct":0},{"wins":6,"pct":0.027},{"wins":7,"pct":0.134},{"wins":8,"pct":0.3072},{"wins":9,"pct":0.3328},{"wins":10,"pct":0.165},{"wins":11,"pct":0.034}],"depthWinDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0},{"wins":5,"pct":0},{"wins":6,"pct":0.0205},{"wins":7,"pct":0.1425},{"wins":8,"pct":0.2935},{"wins":9,"pct":0.341},{"wins":10,"pct":0.1695},{"wins":11,"pct":0.033}],"positional":{"total":453.964,"byPos":{"QB":{"pos":"QB","pts":90.77400000000002,"count":5,"slots":1,"top":[{"id":"p1010","pts":90.77400000000002}]},"RB":{"pos":"RB","pts":113.81,"count":10,"slots":2,"top":[{"id":"p1032","pts":48.82},{"id":"p1052","pts":44.080000000000005}]},"WR":{"pos":"WR","pts":118.1,"count":10,"slots":2,"top":[{"id":"p1075","pts":63.76},{"id":"p1086","pts":54.34}]},"TE":{"pos":"TE","pts":36,"count":5,"slots":1,"top":[{"id":"p1126","pts":36}]},"K":{"pos":"K","pts":33,"count":5,"slots":1,"top":[{"id":"p1151","pts":33}]},"DEF":{"pos":"DEF","pts":16.3,"count":5,"slots":1,"top":[{"id":"PIT","pts":16.3}]},"FLEX":{"pos":"FLEX","pts":45.980000000000004,"count":5,"slots":1,"top":[{"id":"p1043","pts":19.36}]}}},"depthPositional":{"total":425.13398899999646,"byPos":{"QB":{"pos":"QB","pts":86.65282400000213,"count":10000},"RB":{"pos":"RB","pts":108.95735999999171,"count":19979},"WR":{"pos":"WR","pts":112.23212500000639,"count":20000},"TE":{"pos":"TE","pts":33.203749999999296,"count":10000},"K":{"pos":"K","pts":27.006300000002106,"count":8197},"DEF":{"pos":"DEF","pts":13.48215000000006,"count":8253},"FLEX":{"pos":"FLEX","pts":43.59948000000252,"count":9999}}}},{"rosterId":6,"name":"Puka Yourself (anand)","teamName":"Puka Yourself","manager":"anand","playoffOdds":0.4228,"byeOdds":null,"depthPlayoffOdds":0.4775,"simExpectedWins":7.3498,"actualWins":5,"actualLosses":4,"actualTies":0,"actualPts":984.87,"projWins":2.374022301247214,"projLosses":2.625977698752786,"projTies":0,"projPts":429.702,"oppSum":441.92800000000005,"oppCount":5,"winDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0},{"wins":5,"pct":0.0364},{"wins":6,"pct":0.1862},{"wins":7,"pct":0.3376},{"wins":8,"pct":0.2912},{"wins":9,"pct":0.1282},{"wins":10,"pct":0.0204}],"depthWinDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0},{"wins":5,"pct":0.032},{"wins":6,"pct":0.1605},{"wins":7,"pct":0.306},{"wins":8,"pct":0.3335},{"wins":9,"pct":0.1455},{"wins":10,"pct":0.0225}],"positional":{"total":429.702,"byPos":{"QB":{"pos":"QB","pts":81.02199999999999,"count":5,"slots":1,"top":[{"id":"p1011","pts":81.02199999999999}]},"RB":{"pos":"RB","pts":110.62,"count":10,"slots":2,"top":[{"id":"p1033","pts":59.94},{"id":"p1042","pts":38.99999999999999}]},"WR":{"pos":"WR","pts":103.72,"count":10,"slots":2,"top":[{"id":"p1085","pts":51.68},{"id":"p1076","pts":33.74000000000001}]},"TE":{"pos":"TE","pts":38.24,"count":5,"slots":1,"top":[{"id":"p1127","pts":38.24}]},"K":{"pos":"K","pts":35.1,"count":5,"slots":1,"top":[{"id":"p1152","pts":35.1}]},"DEF":{"pos":"DEF","pts":14.2,"count":5,"slots":1,"top":[{"id":"SEA","pts":14.2}]},"FLEX":{"pos":"FLEX","pts":46.800000000000004,"count":5,"slots":1,"top":[{"id":"p1053","pts":28.61}]}}},"depthPositional":{"total":400.11765500000934,"byPos":{"QB":{"pos":"QB","pts":77.39257499999705,"count":10000},"RB":{"pos":"RB","pts":106.06442000001014,"count":19941},"WR":{"pos":"WR","pts":98.96417499999856,"count":20000},"TE":{"pos":"TE","pts":35.27746000000178,"count":10000},"K":{"pos":"K","pts":28.879699999999943,"count":8255},"DEF":{"pos":"DEF","pts":11.663499999999527,"count":8279},"FLEX":{"pos":"FLEX","pts":41.87582499999911,"count":10000}}}},{"rosterId":7,"name":"Two Tight Ends (jessie.r)","teamName":"Two Tight Ends","manager":"jessie.r","playoffOdds":0.0452,"byeOdds":null,"depthPlayoffOdds":0.0485,"simExpectedWins":5.443,"actualWins":3,"actualLosses":6,"actualTies":0,"actualPts":1012.98,"projWins":2.4210872886194577,"projLosses":2.578912711380542,"projTies":0,"projPts":415.41400000000004,"oppSum":423.70199999999994,"oppCount":5,"winDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0.0358},{"wins":4,"pct":0.167},{"wins":5,"pct":0.3114},{"wins":6,"pct":0.3116},{"wins":7,"pct":0.1526},{"wins":8,"pct":0.0216}],"depthWinDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0.04},{"wins":4,"pct":0.185},{"wins":5,"pct":0.312},{"wins":6,"pct":0.295},{"wins":7,"pct":0.1435},{"wins":8,"pct":0.0245}],"positional":{"total":415.41400000000004,"byPos":{"QB":{"pos":"QB","pts":83.024,"count":5,"slots":1,"top":[{"id":"p1012","pts":68.068}]},"RB":{"pos":"RB","pts":116.71000000000001,"count":10,"slots":2,"top":[{"id":"p1034","pts":62.809999999999995},{"id":"p1041","pts":30.590000000000003}]},"WR":{"pos":"WR","pts":100.16000000000001,"count":10,"slots":2,"top":[{"id":"p1084","pts":42.11},{"id":"p1077","pts":40.599999999999994}]},"TE":{"pos":"TE","pts":29.46,"count":5,"slots":1,"top":[{"id":"p1128","pts":29.46}]},"K":{"pos":"K","pts":32.6,"count":5,"slots":1,"top":[{"id":"p1153","pts":32.6}]},"DEF":{"pos":"DEF","pts":7.8,"count":5,"slots":1,"top":[{"id":"ARI","pts":7.8}]},"FLEX":{"pos":"FLEX","pts":45.660000000000004,"count":5,"slots":1,"top":[{"id":"p1054","pts":29.200000000000003}]}}},"depthPositional":{"total":388.88583100000363,"byPos":{"QB":{"pos":"QB","pts":79.3641810000016,"count":10000},"RB":{"pos":"RB","pts":110.80736999999502,"count":19953},"WR":{"pos":"WR","pts":95.60347999999972,"count":20000},"TE":{"pos":"TE","pts":27.856525000000058,"count":10000},"K":{"pos":"K","pts":26.624300000001487,"count":8193},"DEF":{"pos":"DEF","pts":6.625050000000117,"count":8257},"FLEX":{"pos":"FLEX","pts":42.004924999998025,"count":10000}}}},{"rosterId":8,"name":"Flexual Healing (quinn_d)","teamName":"Flexual Healing","manager":"quinn_d","playoffOdds":0.1464,"byeOdds":null,"depthPlayoffOdds":0.1565,"simExpectedWins":6.2256,"actualWins":4,"actualLosses":5,"actualTies":0,"actualPts":995.68,"projWins":2.235068914692632,"projLosses":2.764931085307368,"projTies":0,"projPts":419.374,"oppSum":444.56,"oppCount":5,"winDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0.051},{"wins":5,"pct":0.2126},{"wins":6,"pct":0.3392},{"wins":7,"pct":0.272},{"wins":8,"pct":0.1074},{"wins":9,"pct":0.0178}],"depthWinDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0.0445},{"wins":5,"pct":0.194},{"wins":6,"pct":0.3155},{"wins":7,"pct":0.307},{"wins":8,"pct":0.118},{"wins":9,"pct":0.021}],"positional":{"total":419.374,"byPos":{"QB":{"pos":"QB","pts":87.56400000000001,"count":5,"slots":1,"top":[{"id":"p1013","pts":74.516}]},"RB":{"pos":"RB","pts":117.22999999999999,"count":10,"slots":2,"top":[{"id":"p1040","pts":59.28},{"id":"p1035","pts":57.95000000000001}]},"WR":{"pos":"WR","pts":101.60000000000001,"count":10,"slots":2,"top":[{"id":"p1078","pts":42.900000000000006},{"id":"p1083","pts":42.16000000000001}]},"TE":{"pos":"TE","pts":29.080000000000002,"count":5,"slots":1,"top":[{"id":"p1129","pts":29.080000000000002}]},"K":{"pos":"K","pts":31.700000000000003,"count":5,"slots":1,"top":[{"id":"p1154","pts":31.700000000000003}]},"DEF":{"pos":"DEF","pts":9,"count":5,"slots":1,"top":[{"id":"CHI","pts":9}]},"FLEX":{"pos":"FLEX","pts":43.2,"count":5,"slots":1,"top":[{"id":"p1060","pts":16.99}]}}},"depthPositional":{"total":393.0474379999981,"byPos":{"QB":{"pos":"QB","pts":82.55134799999891,"count":10000},"RB":{"pos":"RB","pts":110.44519500000752,"count":19991},"WR":{"pos":"WR","pts":98.1876700000022,"count":20000},"TE":{"pos":"TE","pts":27.857524999998017,"count":10000},"K":{"pos":"K","pts":25.807600000002413,"count":8181},"DEF":{"pos":"DEF","pts":7.333500000000022,"count":8226},"FLEX":{"pos":"FLEX","pts":40.86459999999919,"count":10000}}}},{"rosterId":9,"name":"Kupp Of Joe (darius)","teamName":"Kupp Of Joe","manager":"darius","playoffOdds":0.7674,"byeOdds":null,"depthPlayoffOdds":0.751,"simExpectedWins":8.6108,"actualWins":6,"actualLosses":3,"actualTies":0,"actualPts":909.71,"projWins":2.5976628570805333,"projLosses":2.4023371429194667,"projTies":0,"projPts":436.078,"oppSum":426.58400000000006,"oppCount":5,"winDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0},{"wins":5,"pct":0},{"wins":6,"pct":0.0212},{"wins":7,"pct":0.1344},{"wins":8,"pct":0.2968},{"wins":9,"pct":0.3412},{"wins":10,"pct":0.1728},{"wins":11,"pct":0.0336}],"depthWinDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0},{"wins":4,"pct":0},{"wins":5,"pct":0},{"wins":6,"pct":0.026},{"wins":7,"pct":0.1365},{"wins":8,"pct":0.3125},{"wins":9,"pct":0.3205},{"wins":10,"pct":0.168},{"wins":11,"pct":0.0365}],"positional":{"total":436.078,"byPos":{"QB":{"pos":"QB","pts":87.088,"count":5,"slots":1,"top":[{"id":"p1014","pts":72.13}]},"RB":{"pos":"RB","pts":120.93,"count":10,"slots":2,"top":[{"id":"p1036","pts":61.150000000000006},{"id":"p1039","pts":59.78}]},"WR":{"pos":"WR","pts":109.92,"count":10,"slots":2,"top":[{"id":"p1082","pts":55.68},{"id":"p1079","pts":44.1}]},"TE":{"pos":"TE","pts":34.68,"count":5,"slots":1,"top":[{"id":"p1133","pts":20.84}]},"K":{"pos":"K","pts":36,"count":5,"slots":1,"top":[{"id":"p1155","pts":36}]},"DEF":{"pos":"DEF","pts":6.999999999999999,"count":5,"slots":1,"top":[{"id":"IND","pts":6.999999999999999}]},"FLEX":{"pos":"FLEX","pts":40.46,"count":5,"slots":1,"top":[{"id":"p1099","pts":25.900000000000002}]}}},"depthPositional":{"total":406.84298199998716,"byPos":{"QB":{"pos":"QB","pts":82.97943700000009,"count":10000},"RB":{"pos":"RB","pts":112.00236499999872,"count":19999},"WR":{"pos":"WR","pts":104.74094500000068,"count":20000},"TE":{"pos":"TE","pts":33.38492000000053,"count":10000},"K":{"pos":"K","pts":29.650000000000134,"count":8198},"DEF":{"pos":"DEF","pts":5.703150000000242,"count":8250},"FLEX":{"pos":"FLEX","pts":38.382165000000555,"count":10000}}}},{"rosterId":10,"name":"Scary Terry Cloth (leah.v)","teamName":"Scary Terry Cloth","manager":"leah.v","playoffOdds":0.0442,"byeOdds":null,"depthPlayoffOdds":0.0415,"simExpectedWins":5.0344,"actualWins":3,"actualLosses":6,"actualTies":0,"actualPts":1061.95,"projWins":2.051243009632321,"projLosses":2.948756990367679,"projTies":0,"projPts":405.758,"oppSum":448.954,"oppCount":5,"winDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0.0714},{"wins":4,"pct":0.2478},{"wins":5,"pct":0.3532},{"wins":6,"pct":0.2406},{"wins":7,"pct":0.0766},{"wins":8,"pct":0.0104}],"depthWinDist":[{"wins":0,"pct":0},{"wins":1,"pct":0},{"wins":2,"pct":0},{"wins":3,"pct":0.065},{"wins":4,"pct":0.2255},{"wins":5,"pct":0.3435},{"wins":6,"pct":0.258},{"wins":7,"pct":0.0985},{"wins":8,"pct":0.0095}],"positional":{"total":405.758,"byPos":{"QB":{"pos":"QB","pts":67.288,"count":5,"slots":1,"top":[{"id":"p1015","pts":42.867999999999995}]},"RB":{"pos":"RB","pts":120.54000000000002,"count":10,"slots":2,"top":[{"id":"p1037","pts":63.13},{"id":"p1038","pts":57.41}]},"WR":{"pos":"WR","pts":103.6,"count":10,"slots":2,"top":[{"id":"p1080","pts":33.56},{"id":"p1081","pts":32.67}]},"TE":{"pos":"TE","pts":32.72,"count":5,"slots":1,"top":[{"id":"p1132","pts":20.15}]},"K":{"pos":"K","pts":33.5,"count":5,"slots":1,"top":[{"id":"p1156","pts":33.5}]},"DEF":{"pos":"DEF","pts":7.2,"count":5,"slots":1,"top":[{"id":"KC","pts":7.2}]},"FLEX":{"pos":"FLEX","pts":40.91,"count":5,"slots":1,"top":[{"id":"p1080","pts":16.94}]}}},"depthPositional":{"total":383.44669899999036,"byPos":{"QB":{"pos":"QB","pts":66.03324400000528,"count":10000},"RB":{"pos":"RB","pts":111.9849350000096,"count":19998},"WR":{"pos":"WR","pts":99.73971499999537,"count":19957},"TE":{"pos":"TE","pts":32.397259999996756,"count":10000},"K":{"pos":"K","pts":28.03705000000134,"count":8347},"DEF":{"pos":"DEF","pts":5.981150000000092,"count":8299},"FLEX":{"pos":"FLEX","pts":39.27334499999968,"count":9998}}}}]}};
+            window.__leagueSimCache = {"demo_sf_2026":{"league":{"roster_positions":["QB","RB","RB","WR","WR","WR","TE","FLEX","SUPER_FLEX","K","DEF","BN","BN","BN","BN","BN","BN"]},"__names":{"1":"Bijan Mustard (mikez)","2":"Nix Please (jordan_p)","3":"Hurts So Good (tayl0r)","4":"Kittle Caesars (rachael.q)","5":"The Bowers That Be (sam_h)","6":"Chase Manhattan (demo_manager)","7":"Saquon Barklily (nate99)","8":"Collins Calling (priya.k)","9":"Nacua Matata (devin_t)","10":"Hall of Shame (bex)","11":"Purdy Good Team (olu_a)","12":"Gibbs Me A Break (marcus.w)"}},"demo_std_2026":{"league":{"roster_positions":["QB","RB","RB","WR","WR","TE","FLEX","K","DEF","BN","BN","BN","BN","BN","BN"]},"__names":{"1":"Mixon It Up (hana_l)","2":"Pass The Aux (reggie)","3":"Third And Long Island (sofia.m)","4":"Bench Warmers Union (ty_b)","5":"Two Minute Warning (demo_manager)","6":"Puka Yourself (anand)","7":"Two Tight Ends (jessie.r)","8":"Flexual Healing (quinn_d)","9":"Kupp Of Joe (darius)","10":"Scary Terry Cloth (leah.v)"}}};
+            const __slotPlayers = {"p1000":{"first_name":"Josh","last_name":"Allen","full_name":"Josh Allen","position":"QB","team":"BUF"},"p1024":{"first_name":"Saquon","last_name":"Barkley","full_name":"Saquon Barkley","position":"RB","team":"PHI"},"p1048":{"first_name":"Travis","last_name":"Etienne Jr.","full_name":"Travis Etienne Jr.","position":"RB","team":"JAX"},"p1066":{"first_name":"Ja’Marr","last_name":"Chase","full_name":"Ja’Marr Chase","position":"WR","team":"CIN"},"p1089":{"first_name":"Mike","last_name":"Evans","full_name":"Mike Evans","position":"WR","team":"TB"},"p1090":{"first_name":"Chris","last_name":"Godwin","full_name":"Chris Godwin","position":"WR","team":"TB"},"p1120":{"first_name":"Brock","last_name":"Bowers","full_name":"Brock Bowers","position":"TE","team":"LV"},"p1144":{"first_name":"Brandon","last_name":"Aubrey","full_name":"Brandon Aubrey","position":"K","team":"DAL"},"DEN":{"first_name":"DEN","last_name":"DEF","full_name":"DEN Defense","position":"DEF","team":"DEN"},"p1047":{"first_name":"Isiah","last_name":"Pacheco","full_name":"Isiah Pacheco","position":"RB","team":"KC"},"p1023":{"first_name":"Aaron","last_name":"Rodgers","full_name":"Aaron Rodgers","position":"QB","team":"PIT"},"p1001":{"first_name":"Lamar","last_name":"Jackson","full_name":"Lamar Jackson","position":"QB","team":"BAL"},"p1025":{"first_name":"Bijan","last_name":"Robinson","full_name":"Bijan Robinson","position":"RB","team":"ATL"},"p1049":{"first_name":"Rachaad","last_name":"White","full_name":"Rachaad White","position":"RB","team":"TB"},"p1067":{"first_name":"Justin","last_name":"Jefferson","full_name":"Justin Jefferson","position":"WR","team":"MIN"},"p1088":{"first_name":"Davante","last_name":"Adams","full_name":"Davante Adams","position":"WR","team":"LAR"},"p1091":{"first_name":"Jerry","last_name":"Jeudy","full_name":"Jerry Jeudy","position":"WR","team":"CLE"},"p1121":{"first_name":"Trey","last_name":"McBride","full_name":"Trey McBride","position":"TE","team":"ARI"},"p1145":{"first_name":"Cameron","last_name":"Dicker","full_name":"Cameron Dicker","position":"K","team":"LAC"},"HOU":{"first_name":"HOU","last_name":"DEF","full_name":"HOU Defense","position":"DEF","team":"HOU"},"p1046":{"first_name":"D’Andre","last_name":"Swift","full_name":"D’Andre Swift","position":"RB","team":"CHI"},"p1022":{"first_name":"Sam","last_name":"Darnold","full_name":"Sam Darnold","position":"QB","team":"SEA"},"p1002":{"first_name":"Jalen","last_name":"Hurts","full_name":"Jalen Hurts","position":"QB","team":"PHI"},"p1026":{"first_name":"Jahmyr","last_name":"Gibbs","full_name":"Jahmyr Gibbs","position":"RB","team":"DET"},"p1050":{"first_name":"Javonte","last_name":"Williams","full_name":"Javonte Williams","position":"RB","team":"DAL"},"p1068":{"first_name":"CeeDee","last_name":"Lamb","full_name":"CeeDee Lamb","position":"WR","team":"DAL"},"p1087":{"first_name":"Marvin","last_name":"Harrison Jr.","full_name":"Marvin Harrison Jr.","position":"WR","team":"ARI"},"p1092":{"first_name":"Jameson","last_name":"Williams","full_name":"Jameson Williams","position":"WR","team":"DET"},"p1122":{"first_name":"George","last_name":"Kittle","full_name":"George Kittle","position":"TE","team":"SF"},"p1146":{"first_name":"Chris","last_name":"Boswell","full_name":"Chris Boswell","position":"K","team":"PIT"},"MIN":{"first_name":"MIN","last_name":"DEF","full_name":"MIN Defense","position":"DEF","team":"MIN"},"p1045":{"first_name":"Rhamondre","last_name":"Stevenson","full_name":"Rhamondre Stevenson","position":"RB","team":"NE"},"p1021":{"first_name":"Geno","last_name":"Smith","full_name":"Geno Smith","position":"QB","team":"LV"},"p1003":{"first_name":"Jayden","last_name":"Daniels","full_name":"Jayden Daniels","position":"QB","team":"WAS"},"p1027":{"first_name":"De’Von","last_name":"Achane","full_name":"De’Von Achane","position":"RB","team":"MIA"},"p1051":{"first_name":"Tyrone","last_name":"Tracy Jr.","full_name":"Tyrone Tracy Jr.","position":"RB","team":"NYG"},"p1069":{"first_name":"Amon-Ra","last_name":"St. Brown","full_name":"Amon-Ra St. Brown","position":"WR","team":"DET"},"p1086":{"first_name":"Courtland","last_name":"Sutton","full_name":"Courtland Sutton","position":"WR","team":"DEN"},"p1093":{"first_name":"Khalil","last_name":"Shakir","full_name":"Khalil Shakir","position":"WR","team":"BUF"},"p1123":{"first_name":"Sam","last_name":"LaPorta","full_name":"Sam LaPorta","position":"TE","team":"DET"},"p1147":{"first_name":"Jake","last_name":"Bates","full_name":"Jake Bates","position":"K","team":"DET"},"PHI":{"first_name":"PHI","last_name":"DEF","full_name":"PHI Defense","position":"DEF","team":"PHI"},"p1044":{"first_name":"Chuba","last_name":"Hubbard","full_name":"Chuba Hubbard","position":"RB","team":"CAR"},"p1020":{"first_name":"Bryce","last_name":"Young","full_name":"Bryce Young","position":"QB","team":"CAR"},"p1004":{"first_name":"Patrick","last_name":"Mahomes","full_name":"Patrick Mahomes","position":"QB","team":"KC"},"p1028":{"first_name":"Derrick","last_name":"Henry","full_name":"Derrick Henry","position":"RB","team":"BAL"},"p1052":{"first_name":"Brian","last_name":"Robinson Jr.","full_name":"Brian Robinson Jr.","position":"RB","team":"WAS"},"p1070":{"first_name":"Puka","last_name":"Nacua","full_name":"Puka Nacua","position":"WR","team":"LAR"},"p1085":{"first_name":"Jaylen","last_name":"Waddle","full_name":"Jaylen Waddle","position":"WR","team":"MIA"},"p1094":{"first_name":"DeVonta","last_name":"Smith","full_name":"DeVonta Smith","position":"WR","team":"PHI"},"p1124":{"first_name":"Mark","last_name":"Andrews","full_name":"Mark Andrews","position":"TE","team":"BAL"},"p1148":{"first_name":"Ka’imi","last_name":"Fairbairn","full_name":"Ka’imi Fairbairn","position":"K","team":"HOU"},"BAL":{"first_name":"BAL","last_name":"DEF","full_name":"BAL Defense","position":"DEF","team":"BAL"},"p1043":{"first_name":"Tony","last_name":"Pollard","full_name":"Tony Pollard","position":"RB","team":"TEN"},"p1019":{"first_name":"J.J.","last_name":"McCarthy","full_name":"J.J. McCarthy","position":"QB","team":"MIN"},"p1005":{"first_name":"Joe","last_name":"Burrow","full_name":"Joe Burrow","position":"QB","team":"CIN"},"p1029":{"first_name":"Ashton","last_name":"Jeanty","full_name":"Ashton Jeanty","position":"RB","team":"LV"},"p1042":{"first_name":"Aaron","last_name":"Jones","full_name":"Aaron Jones","position":"RB","team":"MIN"},"p1071":{"first_name":"Malik","last_name":"Nabers","full_name":"Malik Nabers","position":"WR","team":"NYG"},"p1084":{"first_name":"Tee","last_name":"Higgins","full_name":"Tee Higgins","position":"WR","team":"CIN"},"p1095":{"first_name":"Xavier","last_name":"Worthy","full_name":"Xavier Worthy","position":"WR","team":"KC"},"p1125":{"first_name":"Travis","last_name":"Kelce","full_name":"Travis Kelce","position":"TE","team":"KC"},"p1149":{"first_name":"Harrison","last_name":"Butker","full_name":"Harrison Butker","position":"K","team":"KC"},"BUF":{"first_name":"BUF","last_name":"DEF","full_name":"BUF Defense","position":"DEF","team":"BUF"},"p1053":{"first_name":"Najee","last_name":"Harris","full_name":"Najee Harris","position":"RB","team":"LAC"},"p1018":{"first_name":"Michael","last_name":"Penix Jr.","full_name":"Michael Penix Jr.","position":"QB","team":"ATL"},"p1006":{"first_name":"Bo","last_name":"Nix","full_name":"Bo Nix","position":"QB","team":"DEN"},"p1030":{"first_name":"Christian","last_name":"McCaffrey","full_name":"Christian McCaffrey","position":"RB","team":"SF"},"p1041":{"first_name":"David","last_name":"Montgomery","full_name":"David Montgomery","position":"RB","team":"DET"},"p1072":{"first_name":"Nico","last_name":"Collins","full_name":"Nico Collins","position":"WR","team":"HOU"},"p1083":{"first_name":"Zay","last_name":"Flowers","full_name":"Zay Flowers","position":"WR","team":"BAL"},"p1096":{"first_name":"Rashee","last_name":"Rice","full_name":"Rashee Rice","position":"WR","team":"KC"},"p1126":{"first_name":"Tucker","last_name":"Kraft","full_name":"Tucker Kraft","position":"TE","team":"GB"},"p1150":{"first_name":"Tyler","last_name":"Bass","full_name":"Tyler Bass","position":"K","team":"BUF"},"DET":{"first_name":"DET","last_name":"DEF","full_name":"DET Defense","position":"DEF","team":"DET"},"p1054":{"first_name":"Jaylen","last_name":"Warren","full_name":"Jaylen Warren","position":"RB","team":"PIT"},"p1017":{"first_name":"C.J.","last_name":"Stroud","full_name":"C.J. Stroud","position":"QB","team":"HOU"},"p1007":{"first_name":"Baker","last_name":"Mayfield","full_name":"Baker Mayfield","position":"QB","team":"TB"},"p1031":{"first_name":"Josh","last_name":"Jacobs","full_name":"Josh Jacobs","position":"RB","team":"GB"},"p1040":{"first_name":"Alvin","last_name":"Kamara","full_name":"Alvin Kamara","position":"RB","team":"NO"},"p1073":{"first_name":"Brian","last_name":"Thomas Jr.","full_name":"Brian Thomas Jr.","position":"WR","team":"JAX"},"p1082":{"first_name":"Terry","last_name":"McLaurin","full_name":"Terry McLaurin","position":"WR","team":"WAS"},"p1097":{"first_name":"George","last_name":"Pickens","full_name":"George Pickens","position":"WR","team":"DAL"},"p1127":{"first_name":"David","last_name":"Njoku","full_name":"David Njoku","position":"TE","team":"CLE"},"p1151":{"first_name":"Jason","last_name":"Myers","full_name":"Jason Myers","position":"K","team":"SEA"},"GB":{"first_name":"GB","last_name":"DEF","full_name":"GB Defense","position":"DEF","team":"GB"},"p1064":{"first_name":"Kareem","last_name":"Hunt","full_name":"Kareem Hunt","position":"RB","team":"KC"},"p1016":{"first_name":"Tua","last_name":"Tagovailoa","full_name":"Tua Tagovailoa","position":"QB","team":"MIA"},"p1008":{"first_name":"Justin","last_name":"Herbert","full_name":"Justin Herbert","position":"QB","team":"LAC"},"p1039":{"first_name":"Joe","last_name":"Mixon","full_name":"Joe Mixon","position":"RB","team":"HOU"},"p1032":{"first_name":"Kyren","last_name":"Williams","full_name":"Kyren Williams","position":"RB","team":"LAR"},"p1074":{"first_name":"Drake","last_name":"London","full_name":"Drake London","position":"WR","team":"ATL"},"p1081":{"first_name":"DK","last_name":"Metcalf","full_name":"DK Metcalf","position":"WR","team":"PIT"},"p1098":{"first_name":"Jordan","last_name":"Addison","full_name":"Jordan Addison","position":"WR","team":"MIN"},"p1128":{"first_name":"Evan","last_name":"Engram","full_name":"Evan Engram","position":"TE","team":"DEN"},"p1152":{"first_name":"Younghoe","last_name":"Koo","full_name":"Younghoe Koo","position":"K","team":"ATL"},"PIT":{"first_name":"PIT","last_name":"DEF","full_name":"PIT Defense","position":"DEF","team":"PIT"},"p1063":{"first_name":"Samaje","last_name":"Perine","full_name":"Samaje Perine","position":"RB","team":"CIN"},"p1015":{"first_name":"Trevor","last_name":"Lawrence","full_name":"Trevor Lawrence","position":"QB","team":"JAX"},"p1009":{"first_name":"Brock","last_name":"Purdy","full_name":"Brock Purdy","position":"QB","team":"SF"},"p1033":{"first_name":"Bucky","last_name":"Irving","full_name":"Bucky Irving","position":"RB","team":"TB"},"p1038":{"first_name":"Omarion","last_name":"Hampton","full_name":"Omarion Hampton","position":"RB","team":"LAC"},"p1075":{"first_name":"A.J.","last_name":"Brown","full_name":"A.J. Brown","position":"WR","team":"PHI"},"p1080":{"first_name":"Rome","last_name":"Odunze","full_name":"Rome Odunze","position":"WR","team":"CHI"},"p1099":{"first_name":"Keon","last_name":"Coleman","full_name":"Keon Coleman","position":"WR","team":"BUF"},"p1129":{"first_name":"Dalton","last_name":"Kincaid","full_name":"Dalton Kincaid","position":"TE","team":"BUF"},"p1153":{"first_name":"Wil","last_name":"Lutz","full_name":"Wil Lutz","position":"K","team":"DEN"},"SEA":{"first_name":"SEA","last_name":"DEF","full_name":"SEA Defense","position":"DEF","team":"SEA"},"p1062":{"first_name":"Justice","last_name":"Hill","full_name":"Justice Hill","position":"RB","team":"BAL"},"p1014":{"first_name":"Dak","last_name":"Prescott","full_name":"Dak Prescott","position":"QB","team":"DAL"},"p1013":{"first_name":"Jared","last_name":"Goff","full_name":"Jared Goff","position":"QB","team":"DET"},"p1034":{"first_name":"Chase","last_name":"Brown","full_name":"Chase Brown","position":"RB","team":"CIN"},"p1037":{"first_name":"Kenneth","last_name":"Walker III","full_name":"Kenneth Walker III","position":"RB","team":"SEA"},"p1079":{"first_name":"Ladd","last_name":"McConkey","full_name":"Ladd McConkey","position":"WR","team":"LAC"},"p1076":{"first_name":"Garrett","last_name":"Wilson","full_name":"Garrett Wilson","position":"WR","team":"NYJ"},"p1103":{"first_name":"Ricky","last_name":"Pearsall","full_name":"Ricky Pearsall","position":"WR","team":"SF"},"p1133":{"first_name":"Tyler","last_name":"Warren","full_name":"Tyler Warren","position":"TE","team":"IND"},"p1154":{"first_name":"Chase","last_name":"McLaughlin","full_name":"Chase McLaughlin","position":"K","team":"TB"},"ARI":{"first_name":"ARI","last_name":"DEF","full_name":"ARI Defense","position":"DEF","team":"ARI"},"p1100":{"first_name":"Jakobi","last_name":"Meyers","full_name":"Jakobi Meyers","position":"WR","team":"LV"},"p1010":{"first_name":"Caleb","last_name":"Williams","full_name":"Caleb Williams","position":"QB","team":"CHI"},"p1011":{"first_name":"Kyler","last_name":"Murray","full_name":"Kyler Murray","position":"QB","team":"ARI"},"p1036":{"first_name":"Breece","last_name":"Hall","full_name":"Breece Hall","position":"RB","team":"NYJ"},"p1035":{"first_name":"James","last_name":"Cook","full_name":"James Cook","position":"RB","team":"BUF"},"p1078":{"first_name":"Jaxon","last_name":"Smith-Njigba","full_name":"Jaxon Smith-Njigba","position":"WR","team":"SEA"},"p1077":{"first_name":"Tyreek","last_name":"Hill","full_name":"Tyreek Hill","position":"WR","team":"MIA"},"p1102":{"first_name":"Deebo","last_name":"Samuel","full_name":"Deebo Samuel","position":"WR","team":"WAS"},"p1132":{"first_name":"Colston","last_name":"Loveland","full_name":"Colston Loveland","position":"TE","team":"CHI"},"p1155":{"first_name":"Jake","last_name":"Elliott","full_name":"Jake Elliott","position":"K","team":"PHI"},"CHI":{"first_name":"CHI","last_name":"DEF","full_name":"CHI Defense","position":"DEF","team":"CHI"},"p1060":{"first_name":"Jerome","last_name":"Ford","full_name":"Jerome Ford","position":"RB","team":"CLE"},"p1012":{"first_name":"Drake","last_name":"Maye","full_name":"Drake Maye","position":"QB","team":"NE"},"IND":{"first_name":"IND","last_name":"DEF","full_name":"IND Defense","position":"DEF","team":"IND"},"p1156":{"first_name":"Evan","last_name":"McPherson","full_name":"Evan McPherson","position":"K","team":"CIN"},"KC":{"first_name":"KC","last_name":"DEF","full_name":"KC Defense","position":"DEF","team":"KC"}};
+            let prDetailState = {};
+            let prSlotState = null;
+
+            function escapeHtml(str) {
+
+    return String(str == null ? '' : str)
+
+        .replace(/&/g, '&amp;')
+
+        .replace(/</g, '&lt;')
+
+        .replace(/>/g, '&gt;')
+
+        .replace(/"/g, '&quot;')
+
+        .replace(/'/g, '&#39;');
+
+}
+            function renderWinDistChart(dist, playoffLine, expectedWins) {
+
+        if (!dist || dist.length === 0) return '<p style="color: var(--text-muted); font-size: 0.8rem;">No distribution available.</p>';
+
+        const W = 640, H = 190, padL = 34, padB = 26, padT = 10;
+
+        const maxPct = Math.max(...dist.map(d => d.pct), 0.0001);
+
+        const plotW = W - padL - 8, plotH = H - padB - padT;
+
+        const barW = plotW / dist.length;
+
+
+
+        const bars = dist.map((d, i) => {
+
+            const h = (d.pct / maxPct) * plotH;
+
+            const x = padL + i * barW;
+
+            const y = padT + (plotH - h);
+
+            // Bars at or above the playoff cut get the "made it" color, so
+
+            // the chart shows WHERE the playoff line falls in the spread
+
+            // rather than only reporting an aggregate percentage.
+
+            const madeIt = playoffLine !== null && d.wins >= playoffLine;
+
+            const fill = madeIt ? 'var(--status-green)' : 'var(--text-muted)';
+
+            return `<rect x="${(x + barW * 0.12).toFixed(1)}" y="${y.toFixed(1)}" width="${(barW * 0.76).toFixed(1)}" height="${Math.max(h, 0).toFixed(1)}" fill="${fill}" opacity="${madeIt ? '0.85' : '0.45'}"><title>${d.wins} wins — ${(d.pct * 100).toFixed(1)}% of sims</title></rect>`;
+
+        }).join('');
+
+
+
+        const labels = dist.map((d, i) => {
+
+            // Thin the axis labels on a wide range so they never overlap.
+
+            if (dist.length > 12 && d.wins % 2 !== 0) return '';
+
+            const x = padL + i * barW + barW / 2;
+
+            return `<text x="${x.toFixed(1)}" y="${H - 8}" text-anchor="middle" font-size="10" fill="var(--text-muted)">${d.wins}</text>`;
+
+        }).join('');
+
+
+
+        const expX = (typeof expectedWins === 'number' && dist.length)
+
+            ? padL + ((expectedWins - dist[0].wins) / dist.length) * plotW + barW / 2 : null;
+
+        const expLine = (expX !== null && expX >= padL && expX <= W)
+
+            ? `<line x1="${expX.toFixed(1)}" y1="${padT}" x2="${expX.toFixed(1)}" y2="${padT + plotH}" stroke="var(--accent-blue)" stroke-width="2" stroke-dasharray="4 3"><title>Expected wins: ${expectedWins.toFixed(1)}</title></line>`
+
+            : '';
+
+
+
+        return `
+
+            <svg viewBox="0 0 ${W} ${H}" style="width: 100%; height: auto; display: block;">
+
+                <line x1="${padL}" y1="${padT + plotH}" x2="${W - 8}" y2="${padT + plotH}" stroke="var(--border-color)" stroke-width="1"/>
+
+                ${bars}${expLine}${labels}
+
+                <text x="${padL - 28}" y="${padT + 8}" font-size="10" fill="var(--text-muted)" text-anchor="end">${(maxPct * 100).toFixed(0)}%</text>
+
+            </svg>`;
+
+    }
+            function renderPathChart(paths, startWeek) {
+
+        if (!paths || !paths.bands || paths.bands.length === 0) {
+
+            return '<p style="color: var(--text-muted); font-size: 0.8rem;">No path data available.</p>';
+
+        }
+
+        const bands = paths.bands;
+
+        const W = 640, H = 240, padL = 30, padR = 10, padT = 12, padB = 28;
+
+        const plotW = W - padL - padR, plotH = H - padT - padB;
+
+
+
+        const yMax = Math.max(...bands.map(b => b.p90), paths.cutWins || 0, 1);
+
+        const yMin = Math.min(...bands.map(b => b.p10), paths.startWins || 0);
+
+        const span = Math.max(yMax - yMin, 1);
+
+        const X = (i) => padL + (bands.length <= 1 ? 0 : (i / (bands.length - 1)) * plotW);
+
+        const Y = (v) => padT + plotH - ((v - yMin) / span) * plotH;
+
+
+
+        const areaBetween = (loKey, hiKey, fill, opacity) => {
+
+            const up = bands.map((b, i) => `${X(i).toFixed(1)},${Y(b[hiKey]).toFixed(1)}`).join(' L');
+
+            const down = [...bands].reverse().map((b, i) =>
+
+                `${X(bands.length - 1 - i).toFixed(1)},${Y(b[loKey]).toFixed(1)}`).join(' L');
+
+            return `<path d="M${up} L${down} Z" fill="${fill}" opacity="${opacity}" stroke="none"/>`;
+
+        };
+
+
+
+        const line = (key, stroke, width, dash) => {
+
+            const d = bands.map((b, i) => `${X(i).toFixed(1)},${Y(b[key]).toFixed(1)}`).join(' L');
+
+            return `<path d="M${d}" fill="none" stroke="${stroke}" stroke-width="${width}"${dash ? ` stroke-dasharray="${dash}"` : ''}/>`;
+
+        };
+
+
+
+        // Sampled paths drawn first so the bands and median sit on top.
+
+        const samples = (paths.samples || []).map(pathArr => {
+
+            const d = pathArr.map((v, i) => `${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(' L');
+
+            return `<path d="M${d}" fill="none" stroke="var(--text-muted)" stroke-width="0.7" opacity="0.18"/>`;
+
+        }).join('');
+
+
+
+        // The playoff cut line, derived from the sims themselves — the win
+
+        // total that actually finished in the last playoff spot.
+
+        const cut = paths.cutWins;
+
+        const cutLine = (typeof cut === 'number')
+
+            ? `<line x1="${padL}" y1="${Y(cut).toFixed(1)}" x2="${W - padR}" y2="${Y(cut).toFixed(1)}" stroke="var(--status-yellow)" stroke-width="1.5" stroke-dasharray="6 4"/>
+
+               <text x="${W - padR - 2}" y="${(Y(cut) - 4).toFixed(1)}" text-anchor="end" font-size="10" fill="var(--status-yellow)">playoff cut ~${cut}</text>`
+
+            : '';
+
+
+
+        const xLabels = bands.map((b, i) => {
+
+            if (bands.length > 10 && i % 2 !== 0) return '';
+
+            return `<text x="${X(i).toFixed(1)}" y="${H - 9}" text-anchor="middle" font-size="10" fill="var(--text-muted)">${startWeek + i}</text>`;
+
+        }).join('');
+
+
+
+        return `
+
+            <svg viewBox="0 0 ${W} ${H}" style="width: 100%; height: auto; display: block;">
+
+                ${samples}
+
+                ${areaBetween('p10', 'p90', 'var(--accent-blue)', '0.13')}
+
+                ${areaBetween('p25', 'p75', 'var(--accent-blue)', '0.22')}
+
+                ${cutLine}
+
+                ${line('p50', 'var(--status-green)', 2.5)}
+
+                <text x="${padL - 4}" y="${(padT + 8)}" font-size="10" fill="var(--text-muted)" text-anchor="end">${yMax}</text>
+
+                <text x="${padL - 4}" y="${(padT + plotH)}" font-size="10" fill="var(--text-muted)" text-anchor="end">${yMin}</text>
+
+                ${xLabels}
+
+            </svg>
+
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.72rem; color: var(--text-muted); margin-top: 0.3rem;">
+
+                <span><span style="display:inline-block;width:10px;height:3px;background:var(--status-green);vertical-align:middle;"></span> median path</span>
+
+                <span><span style="display:inline-block;width:10px;height:8px;background:var(--accent-blue);opacity:0.22;vertical-align:middle;"></span> middle 50%</span>
+
+                <span><span style="display:inline-block;width:10px;height:8px;background:var(--accent-blue);opacity:0.13;vertical-align:middle;"></span> middle 80%</span>
+
+                <span>thin grey lines = individual simulated seasons</span>
+
+            </div>`;
+
+    }
+            function renderPrDetailBody() {
+
+        const contentEl = document.getElementById('pr-detail-content');
+
+        const data = window.__prDetail[prDetailState.leagueId];
+
+        if (!contentEl || !data) return;
+
+
+
+        // Use the selected roster from prDetailState, defaulting to user's own roster
+
+        const viewingRosterId = prDetailState.rosterId || data.myRosterId;
+
+        const viewingTeam = data.teams.find(t => t.rosterId === viewingRosterId) || data.teams[0];
+
+        // Every number on this panel belongs to the SELECTED team, which is not
+
+        // necessarily mine. Saying "your expected wins" over another manager's
+
+        // histogram is what made the switcher feel broken, so the copy names
+
+        // whose season it is (Rule 119). Kept inline rather than in a helper:
+
+        // this function is serialized into the standalone HTML export and can
+
+        // call nothing but escapeHtml and the two chart renderers.
+
+        const viewingIsMe = viewingTeam && viewingTeam.rosterId === data.myRosterId;
+
+        const viewingName = (viewingTeam && viewingTeam.name) ? viewingTeam.name : `Team ${viewingRosterId}`;
+
+        // Two forms of the same team on purpose. `viewingName` is the full
+
+        // "Team Name (manager)" label and is used wherever the panel IDENTIFIES
+
+        // the team. The possessive prose uses the team half alone, because
+
+        // "Rival FC (bob)'s expected wins" wedges a parenthetical between the
+
+        // subject and its apostrophe — and the manager is already on screen in
+
+        // the switcher, the banner and the table header. `teamName` is absent
+
+        // from sims cached before it existed, so it falls back to the label.
+
+        const viewingShort = (viewingTeam && viewingTeam.teamName) ? viewingTeam.teamName : viewingName;
+
+        const viewingWhose = viewingIsMe ? 'your' : `${viewingShort}\u2019s`;
+
+        const useDepth = prDetailState.mode === 'depth' && data.usedDepthModel && viewingTeam && viewingTeam.depthWinDist;
+
+        const dist = useDepth ? viewingTeam.depthWinDist : (viewingTeam ? viewingTeam.winDist : []);
+
+        const odds = useDepth ? viewingTeam.depthPlayoffOdds : (viewingTeam ? viewingTeam.playoffOdds : null);
+
+        const paths = useDepth ? (data.depthPaths || data.paths) : data.paths;
+
+        // BUG FIX: the histogram previously received a hardcoded null here, so
+
+        // no bar ever qualified as "made the playoffs" while the caption
+
+        // promised green ones. The real threshold is now derived from the sims
+
+        // themselves — the win total that actually finished in the last
+
+        // playoff spot — which also gives the fan chart its cut line.
+
+        const cutWins = paths && typeof paths.cutWins === 'number' ? paths.cutWins : null;
+
+        // Playoff line = fewest wins that still made the cut in this
+
+        // distribution's own terms. Derived from the data rather than assumed,
+
+        // since it shifts with league size and schedule.
+
+        const expected = dist.reduce((sum, d) => sum + d.wins * d.pct, 0);
+
+
+
+        // League-wide positional context: rank every team at each position so
+
+        // "31.4 pts" becomes "3rd of 12", which is the actionable form.
+
+        // Use depth positional data when in depth mode, baseline otherwise.
+
+        const allPositions = new Set();
+
+        data.teams.forEach(t => {
+
+            const posData = useDepth ? (t.depthPositional || t.positional) : t.positional;
+
+            if (posData) Object.keys(posData.byPos).forEach(p => allPositions.add(p));
+
+        });
+
+        const posRows = [...allPositions].sort().map(pos => {
+
+            const vals = data.teams.map(t => {
+
+                const posData = useDepth ? (t.depthPositional || t.positional) : t.positional;
+
+                return {
+
+                    rosterId: t.rosterId,
+
+                    pts: (posData && posData.byPos[pos]) ? posData.byPos[pos].pts : 0
+
+                };
+
+            }).sort((a, b) => b.pts - a.pts);
+
+            const viewingIdx = vals.findIndex(v => v.rosterId === viewingRosterId);
+
+            const viewing = viewingIdx >= 0 ? vals[viewingIdx] : null;
+
+            const avg = vals.reduce((sum, v) => sum + v.pts, 0) / (vals.length || 1);
+
+            const rank = viewingIdx >= 0 ? viewingIdx + 1 : null;
+
+            const delta = viewing ? viewing.pts - avg : 0;
+
+            const good = delta >= 0;
+
+            return `
+
+                <tr style="border-bottom: 1px solid var(--border-color);">
+
+                    <td style="padding: 0.4rem 0.5rem 0.4rem 0;"><button type="button" class="pr-slot-btn" data-slot="${escapeHtml(pos)}" title="See who fills this slot, and how it ranks" style="background: none; border: none; padding: 0; font: inherit; font-weight: 700; color: var(--accent-blue); cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px;">${escapeHtml(({ SUPER_FLEX: 'SUPERFLEX', REC_FLEX: 'REC FLEX', WRRB_FLEX: 'W/R FLEX', IDP_FLEX: 'IDP FLEX' })[pos] || pos)}</button></td>
+
+                    <td style="padding: 0.4rem 0.5rem; text-align: right; font-weight: 600;">${viewing ? viewing.pts.toFixed(1) : '—'}</td>
+
+                    <td style="padding: 0.4rem 0.5rem; text-align: right; color: var(--text-muted);">${avg.toFixed(1)}</td>
+
+                    <td style="padding: 0.4rem 0.5rem; text-align: right; color: ${good ? 'var(--status-green)' : 'var(--status-red)'};">${good ? '+' : ''}${delta.toFixed(1)}</td>
+
+                    <td style="padding: 0.4rem 0 0.4rem 0.5rem; text-align: right; font-weight: 700;">${rank ? `${rank} of ${vals.length}` : '—'}</td>
+
+                </tr>`;
+
+        }).join('');
+
+
+
+        contentEl.innerHTML = `
+
+            ${viewingIsMe ? '' : `<p style="margin: 0 0 0.85rem; padding: 0.5rem 0.7rem; border-left: 3px solid var(--status-purple); background: var(--bg-card); border-radius: 0 0.35rem 0.35rem 0; font-size: 0.8rem; color: var(--text-main);">Viewing <strong>${escapeHtml(viewingName)}</strong>, not your own team — every number below is theirs.</p>`}
+
+            <h3 style="margin: 0 0 0.5rem; font-size: 1rem;">Simulated season outcomes</h3>
+
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 0.5rem;">
+
+                Every bar is a final win total across the simulated season.${cutWins !== null ? ` Green bars cleared the playoff cut (~${cutWins} wins in this league).` : ''} The dashed line marks ${escapeHtml(viewingWhose)} expected wins (${expected.toFixed(1)}). Sim playoff rate: <strong style="color: var(--text-main);">${odds === null || odds === undefined ? '—' : (odds * 100).toFixed(0) + '%'}</strong>.
+
+            </p>
+
+            ${renderWinDistChart(dist, cutWins, expected)}
+
+
+
+            <h3 style="margin: 1.25rem 0 0.5rem; font-size: 1rem;">How the season gets there</h3>
+
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 0.5rem;">Cumulative wins week by week across the simulated seasons. The histogram above shows where ${viewingIsMe ? 'you finish' : 'this team finishes'}; this shows WHEN the outcomes separate — a fan that stays tight until late means the season is still genuinely open.</p>
+
+            ${renderPathChart(paths, data.startWeek)}
+
+
+
+            <h3 style="margin: 1.25rem 0 0.5rem; font-size: 1rem;">Positional production vs the league</h3>
+
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 0.5rem;">Points ${escapeHtml(viewingWhose)} optimal lineup is <strong style="color: var(--text-main);">projected to score from each starting slot over the ${data.lastRegularWeek - data.startWeek + 1} week${data.lastRegularWeek - data.startWeek + 1 === 1 ? '' : 's'} still to play (${data.startWeek}–${data.lastRegularWeek})</strong>, ranked against every other team. Weeks already played are NOT counted, so these totals shrink as the season goes — they compare rosters against each other today, not against last month. Click a slot to see who produces it across the whole league.</p>
+
+            <div style="overflow-x: auto;">
+
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+
+                <thead><tr style="border-bottom: 2px solid var(--border-color); color: var(--text-muted); font-size: 0.72rem; text-transform: uppercase;">
+
+                    <th style="text-align: left; padding: 0.3rem 0.5rem 0.3rem 0;">Pos</th>
+
+                    <th style="text-align: right; padding: 0.3rem 0.5rem;">${viewingIsMe ? 'You' : escapeHtml(viewingName)}</th>
+
+                    <th style="text-align: right; padding: 0.3rem 0.5rem;">League avg</th>
+
+                    <th style="text-align: right; padding: 0.3rem 0.5rem;">Diff</th>
+
+                    <th style="text-align: right; padding: 0.3rem 0 0.3rem 0.5rem;">Rank</th>
+
+                </tr></thead>
+
+                <tbody>${posRows}</tbody>
+
+            </table></div>`;
+
+    }
+
+            // ---- the positional slot panel, reused verbatim ----------------
+            // These are the SAME functions the app runs. Only their two
+            // environment dependencies are stubbed below, so the exported panel
+            // cannot drift from the live one.
+            function playerDisplayName(pData, fallback) {
+
+    if (!pData) return fallback || 'Unknown';
+
+    return pData.full_name
+
+        || [pData.first_name, pData.last_name].filter(Boolean).join(' ').trim()
+
+        || fallback
+
+        || 'Unknown';
+
+}
+            function positionalSlotLabel(slot) {
+
+    return ({
+
+        SUPER_FLEX: 'SUPERFLEX',
+
+        REC_FLEX: 'REC FLEX',
+
+        WRRB_FLEX: 'W/R FLEX',
+
+        IDP_FLEX: 'IDP FLEX'
+
+    })[slot] || slot;
+
+}
+            function slotTableColumns() {
+
+        return {
+
+            rank: { label: '#', align: 'right', defaultDir: 'asc', title: 'Rank in this slot', value: r => r.rank },
+
+            manager: { label: 'Manager', align: 'left', defaultDir: 'asc', value: r => r.name.toLowerCase() },
+
+            pts: { label: 'Points', align: 'right', defaultDir: 'desc', title: 'Season production from this slot', value: r => r.pts },
+
+            diff: { label: 'vs Avg', align: 'right', defaultDir: 'desc', title: 'Difference from the league average for this slot', value: r => r.diff }
+
+        };
+
+    }
+            function sortSlotRows(rows, key, dir) {
+
+        const col = slotTableColumns()[key];
+
+        if (!col) return rows;
+
+        const factor = dir === 'asc' ? 1 : -1;
+
+        return [...rows].sort((a, b) => {
+
+            const va = col.value(a), vb = col.value(b);
+
+            if (typeof va === 'string') return factor * va.localeCompare(vb);
+
+            return factor * (va - vb);
+
+        });
+
+    }
+            function slotStandings(teams, slot, useDepth) {
+
+        return (teams || []).map(t => {
+
+            const pd = useDepth ? (t.depthPositional || t.positional) : t.positional;
+
+            return {
+
+                rosterId: t.rosterId,
+
+                pts: (pd && pd.byPos && pd.byPos[slot]) ? pd.byPos[slot].pts : 0
+
+            };
+
+        }).sort((a, b) => b.pts - a.pts);
+
+    }
+            function orderedSlotsFor(leagueId, data, useDepth) {
+
+        const cache = (window.__leagueSimCache || {})[leagueId];
+
+        const lineup = [];
+
+        const rosterPositions = (cache && cache.league && Array.isArray(cache.league.roster_positions))
+
+            ? cache.league.roster_positions : [];
+
+        rosterPositions.forEach(p => {
+
+            if (p === 'BN' || p === 'IR' || p === 'TAXI') return;
+
+            if (!lineup.includes(p)) lineup.push(p);
+
+        });
+
+        const seen = new Set();
+
+        (data.teams || []).forEach(t => {
+
+            const pd = useDepth ? (t.depthPositional || t.positional) : t.positional;
+
+            if (pd && pd.byPos) Object.keys(pd.byPos).forEach(p => seen.add(p));
+
+        });
+
+        return [...lineup.filter(p => seen.has(p)), ...[...seen].filter(p => !lineup.includes(p)).sort()];
+
+    }
+            function startingSlotCount(leagueId, slot, entry) {
+
+        const cache = (window.__leagueSimCache || {})[leagueId];
+
+        const positions = (cache && cache.league && Array.isArray(cache.league.roster_positions))
+
+            ? cache.league.roster_positions : [];
+
+        const fromLeague = positions.filter(p => p === slot).length;
+
+        if (fromLeague > 0) return fromLeague;
+
+        if (entry && entry.slots > 0) return entry.slots;
+
+        return 1;
+
+    }
+            function renderSlotTable() {
+
+        const st = prSlotState;
+
+        const contentEl = document.getElementById('pr-slot-content');
+
+        if (!st || !contentEl) return;
+
+        const data = (window.__prDetail || {})[st.leagueId];
+
+        if (!data) return;
+
+
+
+        const cache = (window.__leagueSimCache || {})[st.leagueId];
+
+        const names = rosterNameObject(cache);
+
+        const slots = orderedSlotsFor(st.leagueId, data, st.useDepth);
+
+        const masterPlayers = st.masterPlayers || {};
+
+
+
+        document.getElementById('pr-slot-title').innerText = 'Positional breakdown';
+
+        document.getElementById('pr-slot-subtitle').innerText =
+
+            `${data.leagueName || ''} · weeks ${data.startWeek}–${data.lastRegularWeek} projected${st.useDepth ? ' · depth-adjusted' : ''}`;
+
+
+
+        // One chip per starting slot, each carrying how many of it the league
+
+        // starts. Switching slots keeps the sort, so comparing two slots is a
+
+        // click rather than a re-sort.
+
+        const chips = slots.map(slot => {
+
+            const on = slot === st.slot;
+
+            const n = startingSlotCount(st.leagueId, slot, null);
+
+            return `<button type="button" class="pr-slot-chip" data-slot="${escapeHtml(slot)}" style="background: ${on ? 'var(--accent-blue)' : 'transparent'}; color: ${on ? 'white' : 'var(--text-muted)'}; border: 1px solid ${on ? 'var(--accent-blue)' : 'var(--border-color)'}; border-radius: 999px; padding: 0.3rem 0.7rem; font-size: 0.78rem; font-weight: 700; cursor: pointer; white-space: nowrap;">${escapeHtml(positionalSlotLabel(slot))} <span style="opacity: 0.75; font-weight: 600;">×${n}</span></button>`;
+
+        }).join('');
+
+
+
+        const slot = st.slot;
+
+        const slotCount = startingSlotCount(st.leagueId, slot, null);
+
+        // Inclusive: a run from week 11 to week 14 covers four weeks.
+
+        const weeksLeft = Math.max(1, (data.lastRegularWeek - data.startWeek) + 1);
+
+        const standings = slotStandings(data.teams, slot, st.useDepth);
+
+        const avg = standings.reduce((sum, v) => sum + v.pts, 0) / (standings.length || 1);
+
+
+
+        let anyContributors = false;
+
+        const rows = standings.map((v, i) => {
+
+            const team = data.teams.find(t => t.rosterId === v.rosterId);
+
+            // Contributors always come from the BASELINE run: the depth model
+
+            // reports how much a roster loses to injury and carries no
+
+            // per-player attribution of its own.
+
+            const base = team && team.positional && team.positional.byPos && team.positional.byPos[slot];
+
+            const top = (base && Array.isArray(base.top)) ? base.top.slice(0, slotCount) : [];
+
+            if (top.length > 0) anyContributors = true;
+
+            return {
+
+                rosterId: v.rosterId,
+
+                rank: i + 1,
+
+                name: names[v.rosterId] || `Roster ${v.rosterId}`,
+
+                pts: v.pts,
+
+                diff: v.pts - avg,
+
+                top
+
+            };
+
+        });
+
+
+
+        const sorted = sortSlotRows(rows, st.sortKey, st.sortDir);
+
+        const columns = slotTableColumns();
+
+        const headCells = Object.keys(columns).map(key => {
+
+            const col = columns[key];
+
+            const active = st.sortKey === key;
+
+            const arrow = active ? (st.sortDir === 'asc' ? ' ▲' : ' ▼') : '';
+
+            return `<th class="pr-slot-sort" data-key="${key}" title="${escapeHtml(col.title || 'Sort by ' + col.label)}" style="text-align: ${col.align}; padding: 0.3rem 0.5rem; cursor: pointer; white-space: nowrap; color: ${active ? 'var(--text-main)' : 'var(--text-muted)'};">${escapeHtml(col.label)}${arrow}</th>`;
+
+        }).join('');
+
+
+
+        const bodyRows = sorted.map(r => {
+
+            const isMine = r.rosterId === st.rosterId;
+
+            const contributors = r.top.length > 0
+
+                ? r.top.map(c => {
+
+                    const p = masterPlayers[c.id] || {};
+
+                    return `<span style="display: inline-block; margin-right: 0.6rem; white-space: nowrap;"><strong style="color: var(--text-main);">${escapeHtml(playerDisplayName(p, c.id))}</strong><span style="color: var(--text-muted); font-size: 0.72rem;"> ${escapeHtml(p.position || '?')} ${c.pts.toFixed(0)}</span></span>`;
+
+                }).join('')
+
+                : '<span style="color: var(--text-muted);">—</span>';
+
+            return `
+
+                <tr style="border-bottom: 1px solid var(--border-color); background: ${isMine ? 'rgba(59,130,246,0.08)' : 'transparent'};">
+
+                    <td style="padding: 0.4rem 0.5rem; text-align: right; color: var(--text-muted); font-weight: 700;">${r.rank}</td>
+
+                    <td style="padding: 0.4rem 0.5rem; font-weight: ${isMine ? '700' : '600'};">${escapeHtml(r.name)}${isMine ? ' <span style="color: var(--status-green); font-size: 0.7rem;">(you)</span>' : ''}</td>
+
+                    <td style="padding: 0.4rem 0.5rem; text-align: right; font-weight: 700;">${r.pts.toFixed(1)}</td>
+
+                    <td style="padding: 0.4rem 0.5rem; text-align: right; color: ${r.diff >= 0 ? 'var(--status-green)' : 'var(--status-red)'};">${r.diff >= 0 ? '+' : ''}${r.diff.toFixed(1)}</td>
+
+                    <td style="padding: 0.4rem 0 0.4rem 0.5rem; font-size: 0.82rem;">${contributors}</td>
+
+                </tr>`;
+
+        }).join('');
+
+
+
+        contentEl.innerHTML = `
+
+            <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.75rem;">${chips}</div>
+
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 0.6rem;">
+
+                Every manager, ranked by what their <strong style="color: var(--text-main);">${escapeHtml(positionalSlotLabel(slot))}</strong>
+
+                slot${slotCount === 1 ? '' : 's'} ${weeksLeft === 1 ? 'is' : 'are'}
+
+                <strong style="color: var(--text-main);">projected to score over the ${weeksLeft} week${weeksLeft === 1 ? '' : 's'} still to play (${data.startWeek}–${data.lastRegularWeek})</strong>.
+
+                Weeks already played are NOT counted, so this shrinks as the season goes and is not comparable
+
+                week to week. The ${slotCount === 1 ? 'player' : `${slotCount} players`} listed
+
+                ${slotCount === 1 ? 'is the one' : 'are the ones'} carrying that slot; their points are what each
+
+                is projected to earn <em>while filling it</em>, so a tight end who keeps winning the flex appears
+
+                under FLEX, not TE. Click a column to re-sort.
+
+            </p>
+
+            ${anyContributors ? '' : '<p style="font-size: 0.78rem; color: var(--status-yellow); margin: 0 0 0.6rem;">This simulation predates per-player attribution, so the contributor column is empty. Re-run Power Rankings for this league to fill it in.</p>'}
+
+            <div style="overflow-x: auto;">
+
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+
+                <thead><tr style="border-bottom: 2px solid var(--border-color); font-size: 0.72rem; text-transform: uppercase;">
+
+                    ${headCells}
+
+                    <th style="text-align: left; padding: 0.3rem 0 0.3rem 0.5rem; color: var(--text-muted); white-space: nowrap;">Top contributors</th>
+
+                </tr></thead>
+
+                <tbody>${bodyRows}</tbody>
+
+            </table></div>`;
+
+
+
+        contentEl.querySelectorAll('.pr-slot-chip').forEach(btn => {
+
+            btn.addEventListener('click', () => {
+
+                prSlotState.slot = btn.getAttribute('data-slot');
+
+                renderSlotTable();
+
+            });
+
+        });
+
+        contentEl.querySelectorAll('.pr-slot-sort').forEach(th => {
+
+            th.addEventListener('click', () => {
+
+                const key = th.getAttribute('data-key');
+
+                // Clicking the active column flips it; a new column starts in
+
+                // the direction that makes that column useful.
+
+                if (prSlotState.sortKey === key) {
+
+                    prSlotState.sortDir = prSlotState.sortDir === 'asc' ? 'desc' : 'asc';
+
+                } else {
+
+                    prSlotState.sortKey = key;
+
+                    prSlotState.sortDir = slotTableColumns()[key].defaultDir;
+
+                }
+
+                renderSlotTable();
+
+            });
+
+        });
+
+    }
+            async function openSlotDetail(leagueId, rosterId, useDepth, focusSlot) {
+
+        const data = (window.__prDetail || {})[leagueId];
+
+        const modal = document.getElementById('pr-slot-modal');
+
+        if (!data || !modal) return;
+
+
+
+        const slots = orderedSlotsFor(leagueId, data, useDepth);
+
+        if (slots.length === 0) {
+
+            const contentEl = document.getElementById('pr-slot-content');
+
+            if (contentEl) contentEl.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem;">This simulation has no positional breakdown saved. Re-run Power Rankings for this league.</p>';
+
+            modal.classList.add('active');
+
+            return;
+
+        }
+
+
+
+        prSlotState = {
+
+            leagueId, rosterId, useDepth,
+
+            slot: slots.includes(focusSlot) ? focusSlot : slots[0],
+
+            // Rank order is the point of the screen, so it is also the default.
+
+            sortKey: 'pts', sortDir: 'desc',
+
+            masterPlayers: null
+
+        };
+
+        modal.classList.add('active');
+
+        renderSlotTable();
+
+
+
+        // Names are only needed for the contributor cells, so the table paints
+
+        // first and fills them in rather than waiting on the dictionary.
+
+        const masterPlayers = await getPlayerDict() || {};
+
+        if (!prSlotState || prSlotState.leagueId !== leagueId) return;
+
+        prSlotState.masterPlayers = masterPlayers;
+
+        renderSlotTable();
+
+    }
+
+            // Stub 1: the names were resolved at export time, so this reads
+            // them back rather than walking a league cache that is not here.
+            function rosterNameObject(cache) { return (cache && cache.__names) || {}; }
+            // Stub 2: the contributors were baked in, so nothing is fetched.
+            async function getPlayerDict() { return __slotPlayers; }
+
+            function openPowerRankingDetail(leagueId) {
+                const data = window.__prDetail[leagueId];
+                const modal = document.getElementById('pr-detail-modal');
+                if (!modal || !data) return;
+                
+                prDetailState = { leagueId, mode: 'baseline', rosterId: data.myRosterId };
+                document.getElementById('pr-detail-title').innerText = data.leagueName;
+                document.getElementById('pr-detail-subtitle').innerText = 
+                    'Weeks ' + data.startWeek + '–' + data.lastRegularWeek + ' simulated · top ' + data.playoffTeams + ' make playoffs';
+                
+                const teamSelect = document.getElementById('pr-detail-team-select');
+                if (teamSelect) {
+                    teamSelect.innerHTML = data.teams.map(t => {
+                        const isMyTeam = t.rosterId === data.myRosterId;
+                        const name = t.name || ('Team ' + t.rosterId);
+                        return '<option value="' + t.rosterId + '"' + (isMyTeam ? ' selected' : '') + '>' + 
+                            escapeHtml(name) + (isMyTeam ? ' (You)' : '') + '</option>';
+                    }).join('');
+                    
+                    teamSelect.onchange = () => {
+                        prDetailState.rosterId = parseInt(teamSelect.value, 10);
+                        renderPrDetailBody();
+                    };
+                }
+                
+                const toggleContainer = document.getElementById('pr-detail-mode-toggle-container');
+                if (toggleContainer) {
+                    if (data.usedDepthModel) {
+                        toggleContainer.innerHTML = `<div class="btn-group">
+                            <button class="btn-sm active" data-mode="baseline">Baseline</button>
+                            <button class="btn-sm" data-mode="depth">Depth risk</button>
+                        </div>`;
+                        const btns = toggleContainer.querySelectorAll('button');
+                        btns.forEach(b => {
+                            b.addEventListener('click', () => {
+                                btns.forEach(btn => btn.classList.remove('active'));
+                                b.classList.add('active');
+                                prDetailState.mode = b.getAttribute('data-mode');
+                                renderPrDetailBody();
+                            });
+                        });
+                    } else {
+                        toggleContainer.innerHTML = '';
+                    }
+                }
+                
+                renderPrDetailBody();
+                modal.style.display = 'block';
+                modal.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            
+            document.addEventListener('DOMContentLoaded', () => {
+                const modal = document.getElementById('pr-detail-modal');
+                const triageTable = document.getElementById('triage-table-card');
+                
+                // Move modal right below the triage table
+                if (modal && triageTable && triageTable.parentNode) {
+                    triageTable.parentNode.insertBefore(modal, triageTable.nextSibling);
+                }
+            
+                const closeBtn = document.getElementById('close-pr-detail-btn');
+                if (closeBtn && modal) {
+                    closeBtn.addEventListener('click', () => {
+                        modal.style.display = 'none';
+                    });
+                }
+
+                // Clicking a position in the positional table opens the same
+                // league-wide slot breakdown the app shows. Delegated, because
+                // renderPrDetailBody rebuilds those buttons on every team and
+                // mode change.
+                document.addEventListener('click', (e) => {
+                    const btn = e.target.closest && e.target.closest('.pr-slot-btn');
+                    if (!btn || !prDetailState.leagueId) return;
+                    const data = window.__prDetail[prDetailState.leagueId];
+                    if (!data) return;
+                    openSlotDetail(
+                        prDetailState.leagueId,
+                        prDetailState.rosterId || data.myRosterId,
+                        prDetailState.mode === 'depth' && data.usedDepthModel,
+                        btn.getAttribute('data-slot'));
+                });
+                const slotModal = document.getElementById('pr-slot-modal');
+                if (slotModal) {
+                    const closeSlots = () => { slotModal.classList.remove('active'); prSlotState = null; };
+                    const slotClose = document.getElementById('pr-slot-close');
+                    if (slotClose) slotClose.addEventListener('click', closeSlots);
+                    slotModal.addEventListener('click', (e) => { if (e.target === slotModal) closeSlots(); });
+                }
+                
+                // Wire up both triage rows and league card buttons
+                document.querySelectorAll('.triage-league-link, .pr-detail-btn, .triage-detail-link').forEach(el => {
+                    el.style.cursor = 'pointer';
+                    el.addEventListener('click', () => {
+                        openPowerRankingDetail(el.getAttribute('data-league-id'));
+                    });
+                });
+                
+                // Triage table sorting
+                if (triageTable) {
+                    let currentSortKey = 'weekLeverage';
+                    let currentSortDir = 'desc';
+                    const defaultDirs = {
+                        leagueName: 'asc', playoffOdds: 'desc', byeOdds: 'desc',
+                        status: 'desc', weekLeverage: 'desc', fragility: 'asc',
+                        weakestSlot: 'asc'
+                    };
+                    const ths = Array.from(triageTable.querySelectorAll('th[data-sort-key]'));
+                    const tbody = triageTable.querySelector('tbody');
+                    ths.forEach(th => {
+                        th.addEventListener('click', () => {
+                            const key = th.getAttribute('data-sort-key');
+                            if (currentSortKey === key) {
+                                currentSortDir = currentSortDir === 'asc' ? 'desc' : 'asc';
+                            } else {
+                                currentSortKey = key;
+                                currentSortDir = defaultDirs[key] || 'desc';
+                            }
+                            
+                            // Update headers
+                            ths.forEach(h => {
+                                const k = h.getAttribute('data-sort-key');
+                                h.style.color = k === currentSortKey ? 'var(--accent-blue)' : '';
+                                h.textContent = h.textContent.replace(' ▲', '').replace(' ▼', '') + (k === currentSortKey ? (currentSortDir === 'asc' ? ' ▲' : ' ▼') : '');
+                            });
+                            
+                            // Sort rows
+                            const colIndex = ths.indexOf(th);
+                            const rows = Array.from(tbody.querySelectorAll('tr'));
+                            const factor = currentSortDir === 'asc' ? 1 : -1;
+                            
+                            rows.sort((a, b) => {
+                                const tdA = a.children[colIndex];
+                                const tdB = b.children[colIndex];
+                                const valA = tdA ? tdA.getAttribute('data-sort-val') : '';
+                                const valB = tdB ? tdB.getAttribute('data-sort-val') : '';
+                                
+                                if (key === 'leagueName') {
+                                    return factor * valA.localeCompare(valB);
+                                } else {
+                                    const numA = parseFloat(valA);
+                                    const numB = parseFloat(valB);
+                                    return factor * (numA - numB);
+                                }
+                            });
+                            
+                            rows.forEach(r => tbody.appendChild(r));
+                        });
+                    });
+                }
+            });
+        </script>
+</body></html>
