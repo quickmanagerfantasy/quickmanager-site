@@ -118,6 +118,17 @@
   .btn-ghost { border-color: var(--border); color: var(--text); }
   .btn-ghost:hover { border-color: var(--muted-dim); }
 
+  /* The "open a saved run" callout in the season-simulation tour row. */
+  .demo-callout {
+    margin-top: 22px; padding: 18px 20px;
+    border: 1px solid var(--border); border-left: 3px solid var(--blue);
+    border-radius: 10px; background: rgba(91,147,255,0.06);
+  }
+  .demo-callout p { margin: 0 0 14px; font-size: 0.94rem; color: var(--muted); }
+  .demo-callout p strong { color: var(--text); }
+  .demo-callout .btn { padding: 10px 18px; font-size: 0.9rem; }
+  .demo-note { display: block; margin-top: 10px; font-size: 0.8rem; color: var(--muted-dim); }
+
   .hero-card {
     background: linear-gradient(180deg, var(--card), var(--card-alt));
     border: 1px solid var(--border);
@@ -485,6 +496,11 @@
           <li>Toggle between your optimal lineup and a depth/injury-adjusted model</li>
           <li>Position-by-position rank against the whole league, not just a total score</li>
         </ul>
+        <div class="demo-callout">
+          <p><strong>Any run saves to a single file you can keep.</strong> One click writes the whole thing &mdash; charts, tables and the positional breakdown &mdash; to one self-contained HTML page that still works offline, with nothing to install to open it. Send it to a leaguemate, keep it as a record of where week 10 stood, or open it next season.</p>
+          <a href="demo.html" class="btn btn-ghost">Open a saved run &rarr;</a>
+          <span class="demo-note">Real export, invented leagues &mdash; nobody else&rsquo;s team names.</span>
+        </div>
       </div>
       <div class="tour-shot">
         <div class="shot-frame"><img src="screenshots/sim-detail.png" alt="QuickManager Power Rankings detail view with a win-total histogram, a fan chart of simulated season paths, and a positional production table" loading="lazy"></div>
