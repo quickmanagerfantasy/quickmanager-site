@@ -3,835 +3,354 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QuickManager — Multi-League Fantasy Tools for Sleeper</title>
-<meta name="description" content="Manage all your Sleeper fantasy football leagues at once: mass lineup optimizer, a gameday board that finds the lineups needing a fix before kickoff, season simulation and power rankings, waiver tools, and cross-league trades.">
+<title>QuickManager for Sleeper: every league, one tab</title>
+<meta name="description" content="Run all of your Sleeper fantasy football leagues from one tab. Autosub replaces ruled out starters before kickoff, plus a live scoreboard, lineup optimizer, waiver tools, trades and power rankings.">
 <link rel="icon" type="image/png" href="icons/icon32.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #0b1120;
-    --bg-deep: #070b16;
-    --card: #141c30;
-    --card-alt: #182140;
-    --border: #263252;
-    --text: #f4f6fb;
-    --muted: #93a1c2;
-    --muted-dim: #5c6a8c;
-    --gold: #f5b31a;
-    --gold-dim: #caa244;
-    --blue: #5b93ff;
-    --green: #34d399;
-    --red: #f87171;
-    --max: 1120px;
-  }
-
-  * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-
-  body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Inter', -apple-system, sans-serif;
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  h1, h2, h3, .display {
-    font-family: 'Oswald', sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 0.01em;
-    font-weight: 600;
-    margin: 0;
-  }
-
-  a { color: var(--gold); }
-
-  .wrap { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
-
-  /* ---------- NAV ---------- */
-  nav {
-    position: sticky; top: 0; z-index: 50;
-    background: rgba(11,17,32,0.88);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--border);
-  }
-  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 68px; }
-  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-  .brand img { height: 34px; width: auto; display: block; }
-  .brand .word { font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 1.15rem; color: var(--text); text-transform: none; letter-spacing: 0; }
-  .brand .word span { color: var(--blue); }
-  .navlinks { display: flex; gap: 28px; font-size: 0.92rem; }
-  .navlinks a { color: var(--muted); text-decoration: none; font-weight: 500; }
-  .navlinks a:hover { color: var(--text); }
-  @media (max-width: 640px) { .navlinks { display: none; } }
-
-  /* ---------- HERO ---------- */
-  .hero {
-    position: relative;
-    padding: 96px 0 64px;
-    overflow: hidden;
-    background:
-      radial-gradient(ellipse 700px 420px at 78% -8%, rgba(245,179,26,0.14), transparent 60%),
-      radial-gradient(ellipse 600px 400px at 5% 10%, rgba(91,147,255,0.10), transparent 60%);
-  }
-  .bolt-streak {
-    position: absolute; top: 0; right: -6%; height: 100%; width: 46%;
-    opacity: 0.5; pointer-events: none;
-  }
-  .hero-inner { position: relative; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: center; }
-  @media (max-width: 900px) { .hero-inner { grid-template-columns: 1fr; } }
-
-  .eyebrow {
-    display: inline-flex; align-items: center; gap: 8px;
-    font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 600;
-    letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold);
-    background: rgba(245,179,26,0.09); border: 1px solid rgba(245,179,26,0.28);
-    padding: 6px 12px; border-radius: 999px; margin-bottom: 22px;
-  }
-  .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 3px rgba(52,211,153,0.18); }
-
-  .hero h1 { font-size: clamp(2.4rem, 5vw, 3.6rem); line-height: 1.04; }
-  .hero h1 .accent { color: var(--gold); }
-  .hero p.lede { font-family: 'Inter', sans-serif; text-transform: none; font-size: 1.14rem; color: var(--muted); max-width: 46ch; margin-top: 22px; font-weight: 400; letter-spacing: 0; }
-
-  .cta-row { display: flex; gap: 14px; margin-top: 34px; flex-wrap: wrap; }
-  /* Official store badges. Per each store's own branding guidelines: never the
-     primary element on the page (sits below the real CTA buttons, at native
-     size, unmodified), and kept a clear gap both from the CTA row above and
-     from the QuickManager logo elsewhere on the page. */
-  .store-badges { display: flex; align-items: center; gap: 20px; margin-top: 28px; flex-wrap: wrap; }
-  .store-badges img { display: block; height: 46px; width: auto; }
-  .store-badges a { opacity: 0.92; transition: opacity 0.15s ease; }
-  .store-badges a:hover { opacity: 1; }
-  .btn {
-    display: inline-flex; align-items: center; gap: 8px;
-    font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.95rem;
-    padding: 13px 22px; border-radius: 10px; text-decoration: none;
-    border: 1px solid transparent; transition: transform 0.12s ease, border-color 0.12s ease;
-  }
-  .btn:hover { transform: translateY(-1px); }
-  .btn-primary { background: var(--gold); color: #14100a; }
-  .btn-primary:hover { background: #ffc233; }
-  .btn-ghost { border-color: var(--border); color: var(--text); }
-  .btn-ghost:hover { border-color: var(--muted-dim); }
-
-  /* The "open a saved run" callout in the season-simulation tour row. */
-  .demo-callout {
-    margin-top: 22px; padding: 18px 20px;
-    border: 1px solid var(--border); border-left: 3px solid var(--blue);
-    border-radius: 10px; background: rgba(91,147,255,0.06);
-  }
-  .demo-callout p { margin: 0 0 14px; font-size: 0.94rem; color: var(--muted); }
-  .demo-callout p strong { color: var(--text); }
-  .demo-callout .btn { padding: 10px 18px; font-size: 0.9rem; }
-  .demo-note { display: block; margin-top: 10px; font-size: 0.8rem; color: var(--muted-dim); }
-
-  .hero-card {
-    background: linear-gradient(180deg, var(--card), var(--card-alt));
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 26px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
-  }
-  .hero-card .row { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--border); font-size: 0.92rem; }
-  .hero-card .row:last-child { border-bottom: none; }
-  .hero-card .row .k { color: var(--muted); font-weight: 500; }
-  .hero-card .row .v { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--text); }
-  .hero-card .v.green { color: var(--green); }
-  .hero-card .v.gold { color: var(--gold); }
-
-  /* ---------- SCOREBOARD TICKER (signature element) ---------- */
-  .ticker {
-    background: var(--bg-deep);
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    overflow: hidden;
-    position: relative;
-  }
-  .ticker::before, .ticker::after {
-    content: ""; position: absolute; top: 0; bottom: 0; width: 60px; z-index: 2;
-  }
-  .ticker::before { left: 0; background: linear-gradient(90deg, var(--bg-deep), transparent); }
-  .ticker::after { right: 0; background: linear-gradient(270deg, var(--bg-deep), transparent); }
-  .ticker-track {
-    display: flex; gap: 64px; white-space: nowrap;
-    animation: scroll-left 26s linear infinite;
-    padding: 16px 0;
-    width: max-content;
-  }
-  .ticker-item {
-    font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; font-weight: 600;
-    color: var(--muted); letter-spacing: 0.03em; display: flex; align-items: center; gap: 10px;
-  }
-  .ticker-item b { color: var(--gold); font-size: 0.9rem; }
-  .ticker-item .sep { color: var(--muted-dim); }
-  @keyframes scroll-left { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-  @media (prefers-reduced-motion: reduce) { .ticker-track { animation: none; } }
-
-  /* ---------- SECTIONS ---------- */
-  section { padding: 88px 0; }
-  .section-head { max-width: 640px; margin-bottom: 48px; }
-  .kicker {
-    font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; font-weight: 600;
-    letter-spacing: 0.14em; text-transform: uppercase; color: var(--blue); margin-bottom: 14px; display: block;
-  }
-  .section-head h2 { font-size: clamp(1.7rem, 3.4vw, 2.3rem); }
-  .section-head p { font-family: 'Inter', sans-serif; text-transform: none; color: var(--muted); font-size: 1.03rem; margin-top: 14px; letter-spacing: 0; font-weight: 400; }
-
-  /* Bolt-shaped divider between sections */
-  .bolt-divider {
-    height: 46px; width: 100%;
-    background: var(--bg);
-  }
-  .bolt-divider svg { display: block; width: 100%; height: 100%; }
-
-  /* Feature cards */
-  .features-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; }
-  @media (max-width: 860px) { .features-grid { grid-template-columns: 1fr; } }
-  .feature-card {
-    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
-    padding: 28px; position: relative; overflow: hidden;
-  }
-  .feature-card .num {
-    font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 600;
-    color: var(--muted-dim); margin-bottom: 18px; display: block;
-  }
-  .feature-card h3 { font-size: 1.2rem; margin-bottom: 12px; color: var(--text); }
-  .feature-card p { font-family: 'Inter', sans-serif; text-transform: none; color: var(--muted); font-size: 0.95rem; font-weight: 400; letter-spacing: 0; margin: 0; }
-  .feature-card.gold-edge { border-top: 2px solid var(--gold); }
-  .feature-card.blue-edge { border-top: 2px solid var(--blue); }
-  .feature-card.green-edge { border-top: 2px solid var(--green); }
-
-  /* Free vs Pro */
-  .plans-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
-  @media (max-width: 760px) { .plans-grid { grid-template-columns: 1fr; } }
-  .plan-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 30px; }
-  .plan-card.pro { background: linear-gradient(180deg, rgba(245,179,26,0.07), var(--card) 40%); border-color: rgba(245,179,26,0.35); }
-  .plan-name { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
-  .plan-card.pro .plan-name { color: var(--gold); }
-  .plan-price { font-family: 'Oswald', sans-serif; font-size: 2.1rem; font-weight: 600; margin-bottom: 4px; }
-  .plan-price sub { font-family: 'Inter', sans-serif; text-transform: none; font-size: 0.9rem; color: var(--muted); font-weight: 500; }
-  .plan-list { list-style: none; padding: 0; margin: 22px 0 0; display: flex; flex-direction: column; gap: 11px; }
-  .plan-list li { font-size: 0.93rem; color: var(--muted); display: flex; gap: 10px; align-items: flex-start; }
-  .plan-list li::before { content: "✓"; color: var(--green); font-weight: 700; flex-shrink: 0; }
-  .plan-card.pro .plan-list li::before { color: var(--gold); }
-
-  /* Setup steps */
-  .setup-tabs { display: flex; gap: 10px; margin-bottom: 28px; flex-wrap: wrap; }
-  .setup-tab {
-    font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 600;
-    padding: 9px 16px; border-radius: 8px; border: 1px solid var(--border); color: var(--muted);
-    letter-spacing: 0.04em; text-transform: uppercase;
-  }
-  .setup-tab.active { color: var(--bg); background: var(--blue); border-color: var(--blue); }
-
-  .steps { counter-reset: step; display: flex; flex-direction: column; gap: 0; }
-  .step {
-    counter-increment: step; display: grid; grid-template-columns: 44px 1fr; gap: 18px;
-    padding: 20px 0; border-bottom: 1px solid var(--border);
-  }
-  .step:last-child { border-bottom: none; }
-  .step::before {
-    content: counter(step);
-    font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.95rem;
-    width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: center; color: var(--blue);
-  }
-  .step h4 { font-family: 'Inter', sans-serif; text-transform: none; font-size: 1rem; font-weight: 600; letter-spacing: 0; margin: 0 0 4px; color: var(--text); }
-  .step p { margin: 0; color: var(--muted); font-size: 0.93rem; }
-  .step code { font-family: 'JetBrains Mono', monospace; background: var(--card-alt); border: 1px solid var(--border); padding: 1px 7px; border-radius: 5px; font-size: 0.85em; color: var(--gold); }
-
-  .callout {
-    background: var(--card-alt); border: 1px solid var(--border); border-left: 3px solid var(--gold);
-    border-radius: 10px; padding: 18px 20px; margin-top: 26px; font-size: 0.92rem; color: var(--muted);
-  }
-  .callout strong { color: var(--text); }
-
-  /* FAQ */
-  .faq-item { border-bottom: 1px solid var(--border); padding: 22px 0; }
-  .faq-item:first-child { padding-top: 0; }
-  .faq-item h4 { font-family: 'Inter', sans-serif; text-transform: none; font-size: 1rem; font-weight: 600; letter-spacing: 0; color: var(--text); margin: 0 0 8px; }
-  .faq-item p { margin: 0; color: var(--muted); font-size: 0.94rem; }
-
-  /* Privacy */
-  .privacy-block { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 32px; }
-  .privacy-block h3 { font-family: 'Inter', sans-serif; text-transform: none; font-size: 1.05rem; font-weight: 600; letter-spacing: 0; color: var(--text); margin: 26px 0 10px; }
-  .privacy-block h3:first-child { margin-top: 0; }
-  .privacy-block p, .privacy-block li { color: var(--muted); font-size: 0.93rem; }
-  .privacy-block ul { padding-left: 20px; margin: 8px 0; }
-  .privacy-block .updated { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--muted-dim); text-transform: uppercase; letter-spacing: 0.06em; }
-
-  /* Footer */
-  footer { border-top: 1px solid var(--border); padding: 48px 0 36px; background: var(--bg-deep); }
-  .footer-grid { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 24px; }
-  .footer-brand { display: flex; align-items: center; gap: 10px; }
-  .footer-brand img { height: 26px; }
-  .footer-brand span { font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 1rem; text-transform: none; letter-spacing: 0; }
-  .footer-note { color: var(--muted-dim); font-size: 0.82rem; max-width: 440px; margin-top: 12px; }
-  .footer-links { display: flex; gap: 22px; flex-wrap: wrap; }
-  .footer-links a { color: var(--muted); text-decoration: none; font-size: 0.88rem; font-weight: 500; }
-  .footer-links a:hover { color: var(--text); }
-  .footer-bottom { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border); font-size: 0.8rem; color: var(--muted-dim); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
-
-  /* What's New / Coming Soon */
-  .soon-badge {
-    display: inline-flex; align-items: center; gap: 8px;
-    font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 600;
-    letter-spacing: 0.12em; text-transform: uppercase; color: var(--blue);
-    background: rgba(91,147,255,0.09); border: 1px solid rgba(91,147,255,0.28);
-    padding: 6px 12px; border-radius: 999px; margin-bottom: 22px;
-  }
-  .soon-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--blue); box-shadow: 0 0 0 3px rgba(91,147,255,0.18); }
-  .whats-new-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
-  @media (max-width: 860px) { .whats-new-grid { grid-template-columns: 1fr; } }
-  .whatsnew-card {
-    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
-    padding: 26px; position: relative;
-  }
-  .whatsnew-card .tag {
-    font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 600;
-    letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue);
-    margin-bottom: 14px; display: block;
-  }
-  .whatsnew-card h3 { font-size: 1.08rem; margin-bottom: 10px; color: var(--text); }
-  .whatsnew-card p { font-family: 'Inter', sans-serif; text-transform: none; color: var(--muted); font-size: 0.92rem; font-weight: 400; letter-spacing: 0; margin: 0; }
-
-  /* ---------- PRODUCT SCREENSHOTS ---------- */
-  .shot-frame {
-    background: linear-gradient(180deg, var(--card), var(--card-alt));
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 10px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
-  }
-  .shot-frame img { display: block; width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--border); }
-
-  .tour-row {
-    display: flex; align-items: center; gap: 52px;
-    padding: 52px 0; border-bottom: 1px solid var(--border); flex-wrap: wrap;
-  }
-  .tour-row:last-child { border-bottom: none; }
-  .tour-row.reverse { flex-direction: row-reverse; }
-  .tour-text { flex: 1 1 360px; }
-  .tour-shot { flex: 1 1 440px; min-width: 0; }
-  .tour-text .kicker { margin-bottom: 12px; }
-  .tour-text h3 { font-size: 1.35rem; margin-bottom: 12px; color: var(--text); }
-  .tour-text p { font-family: 'Inter', sans-serif; text-transform: none; letter-spacing: 0; color: var(--muted); font-size: 0.98rem; font-weight: 400; margin: 0 0 16px; }
-  .tour-points { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 9px; }
-  .tour-points li { font-size: 0.9rem; color: var(--muted); display: flex; gap: 9px; align-items: flex-start; }
-  .tour-points li::before { content: "✓"; color: var(--green); font-weight: 700; flex-shrink: 0; }
-  @media (max-width: 800px) { .tour-row, .tour-row.reverse { flex-direction: column; } }
-
-  ::selection { background: rgba(245,179,26,0.3); }
-  :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
 
-<nav>
+<nav class="nav">
   <div class="wrap">
-    <a href="#top" class="brand">
-      <img src="icons/logo_mark.png" alt="QuickManager">
-      <span class="word">Quick<span>Manager</span></span>
-    </a>
-    <div class="navlinks">
+    <a href="#top" class="brand"><img src="icons/logo_mark.png" alt=""><span>Quick<b>Manager</b></span></a>
+    <a href="changelog.html" class="ver-pill" data-qm-version title="See what changed in each version">v2.0.0</a>
+    <div class="nav-links">
+      <a href="#autosub">Autosub</a>
       <a href="#features">Features</a>
-      <a href="#tour">Screenshots</a>
-      <a href="features.html">All features</a>
-      <a href="#whats-new">What's New</a>
       <a href="#pricing">Pricing</a>
       <a href="#setup">Setup</a>
       <a href="#faq">FAQ</a>
-      <a href="#privacy">Privacy</a>
     </div>
+    <a href="#get" class="btn btn-gold btn-sm">Get QuickManager</a>
   </div>
 </nav>
 
-<div id="top" class="hero">
-  <svg class="bolt-streak" viewBox="0 0 400 700" preserveAspectRatio="xMidYMid slice">
-    <polygon points="230,0 90,340 190,340 130,700 340,300 220,300" fill="#f5b31a" opacity="0.06"/>
-    <polygon points="290,60 170,360 255,360 205,650 380,320 275,320" fill="#5b93ff" opacity="0.05"/>
-  </svg>
-  <div class="wrap hero-inner">
-    <div>
-      <div class="eyebrow"><span class="dot"></span> Live on Chrome &amp; Firefox</div>
-      <h1>Run every Sleeper<br>league from <span class="accent">one tab.</span></h1>
-      <p class="lede">QuickManager scans all your leagues at once — optimal lineups, waiver targets, and trades — so a Sunday morning routine that used to take twelve tabs takes one click.</p>
-      <div class="cta-row">
-        <a href="#setup" class="btn btn-primary">Get started →</a>
-        <a href="#features" class="btn btn-ghost">See what it does</a>
-      </div>
-      <div class="store-badges">
+<header id="top" class="hero">
+  <div class="wrap">
+    <div class="hero-copy">
+      <a href="#autosub" class="new-pill"><span>NEW</span> Autosub fixes your lineups while you are away</a>
+      <h1>Every Sleeper league.<br><span class="accent">One tab.</span></h1>
+      <p class="lede">QuickManager sets lineups, handles injuries, works the waiver wire and reviews trades across all of your leagues at once. Now it can swap out a starter who gets ruled out, even when you are nowhere near your phone.</p>
+      <div id="get" class="store-row">
         <a href="https://chromewebstore.google.com/detail/quickmanager-fantasy-for/maocponhaeapmbgcjdpofjgfabogjibi?utm_source=qm_website" target="_blank" rel="noopener" aria-label="Available in the Chrome Web Store">
-          <img src="https://developer.chrome.com/static/docs/webstore/branding/image/206x58-chrome-web-bcb82d15b2486.png" alt="Available in the Chrome Web Store" height="58">
+          <img src="https://developer.chrome.com/static/docs/webstore/branding/image/206x58-chrome-web-bcb82d15b2486.png" alt="Available in the Chrome Web Store" width="185" height="52">
         </a>
-        <a href="https://addons.mozilla.org/en-US/firefox/addon/quickmanager-for-sleeper/?utm_source=qm_website" target="_blank" rel="noopener" aria-label="Get the Add-on for Firefox">
-          <img src="https://blog.mozilla.org/addons/files/2020/04/get-the-addon-fx-apr-2020.svg" alt="Get the Add-on for Firefox" height="58">
+        <a href="https://addons.mozilla.org/en-US/firefox/addon/quickmanager-for-sleeper/?utm_source=qm_website" target="_blank" rel="noopener" aria-label="Get QuickManager for Firefox">
+          <img src="https://blog.mozilla.org/addons/files/2020/04/get-the-addon-fx-apr-2020.svg" alt="Get QuickManager for Firefox" width="185" height="52">
         </a>
       </div>
+      <div class="trust">
+        <span>Chrome, Edge, Brave and Firefox</span>
+        <span>No account to create</span>
+        <span>Your login stays in your browser</span>
+        <span>7 day free trial</span>
+      </div>
     </div>
-    <div class="hero-card">
-      <div class="row"><span class="k">Leagues managed at once</span><span class="v gold">Unlimited*</span></div>
-      <div class="row"><span class="k">Setup required</span><span class="v">None</span></div>
-      <div class="row"><span class="k">Your Sleeper token leaves your device</span><span class="v green">Never</span></div>
-      <div class="row"><span class="k">Free trial</span><span class="v">7 days, all leagues</span></div>
+    <div class="hero-shot glow">
+      <div class="frame">
+        <div class="bar"><i></i><i></i><i></i><em>QuickManager</em></div>
+        <img src="screenshots/autosub-hero.png" width="2848" height="1542" alt="QuickManager with Away Mode on. The autosub inbox shows Christian McCaffrey ruled out at 3:31 PM and replaced by a different player in each of four leagues.">
+      </div>
     </div>
   </div>
-</div>
+</header>
 
-<div class="ticker" aria-hidden="true">
-  <div class="ticker-track">
-    <span class="ticker-item"><b>LINEUP OPTIMIZER</b> <span class="sep">·</span> scans every league</span>
-    <span class="ticker-item"><b>LATE-GAME FLEX</b> <span class="sep">·</span> pivot after early games finish</span>
-    <span class="ticker-item"><b>POWER RANKINGS</b> <span class="sep">·</span> simulate every season at once</span>
-    <span class="ticker-item"><b>WAIVER RADAR</b> <span class="sep">·</span> targets across leagues</span>
-    <span class="ticker-item"><b>PENDING WAIVERS</b> <span class="sep">·</span> cancel across leagues in one click</span>
-    <span class="ticker-item"><b>TRADE FACTORY</b> <span class="sep">·</span> propose &amp; review in bulk</span>
-    <span class="ticker-item"><b>PLAYER PORTFOLIO</b> <span class="sep">·</span> every league's exposure at once</span>
-    <span class="ticker-item"><b>GAMEDAY BOARD</b> <span class="sep">·</span> every lineup, in kickoff order</span>
-    <span class="ticker-item"><b>1 CLICK</b> <span class="sep">·</span> applies to every roster</span>
-    <span class="ticker-item"><b>PRIVATE BY DESIGN</b> <span class="sep">·</span> no server, no data collection</span>
-    <span class="ticker-item"><b>LINEUP OPTIMIZER</b> <span class="sep">·</span> scans every league</span>
-    <span class="ticker-item"><b>LATE-GAME FLEX</b> <span class="sep">·</span> pivot after early games finish</span>
-    <span class="ticker-item"><b>POWER RANKINGS</b> <span class="sep">·</span> simulate every season at once</span>
-    <span class="ticker-item"><b>WAIVER RADAR</b> <span class="sep">·</span> targets across leagues</span>
-    <span class="ticker-item"><b>PENDING WAIVERS</b> <span class="sep">·</span> cancel across leagues in one click</span>
-    <span class="ticker-item"><b>TRADE FACTORY</b> <span class="sep">·</span> propose &amp; review in bulk</span>
-    <span class="ticker-item"><b>PLAYER PORTFOLIO</b> <span class="sep">·</span> every league's exposure at once</span>
-    <span class="ticker-item"><b>GAMEDAY BOARD</b> <span class="sep">·</span> every lineup, in kickoff order</span>
-    <span class="ticker-item"><b>1 CLICK</b> <span class="sep">·</span> applies to every roster</span>
-    <span class="ticker-item"><b>PRIVATE BY DESIGN</b> <span class="sep">·</span> no server, no data collection</span>
-  </div>
-</div>
-
-<section id="features">
+<section id="autosub" class="section">
   <div class="wrap">
-    <div class="section-head">
-      <span class="kicker">What it does</span>
-      <h2>Four tools. Every league.</h2>
-      <p>Managing one Sleeper league is easy. Managing ten is a chore. QuickManager turns hours of repetitive, league-by-league clicking into a few clicks that run everywhere you play.</p>
-    </div>
-    <div class="features-grid">
-      <div class="feature-card gold-edge">
-        <span class="num">01 — OPTIMIZER</span>
-        <h3>Mass Lineup Optimizer</h3>
-        <p>Scan every league at once and see exactly how many points you're leaving on the bench. Pick a week, review the swaps, apply optimal lineups everywhere with one click. Bye weeks and projections are handled automatically. Optionally prioritize your latest-kickoff players into FLEX spots, so you can still pivot as early games wrap up.</p>
-      </div>
-      <div class="feature-card blue-edge">
-        <span class="num">02 — WAIVERS</span>
-        <h3>Waiver Wire &amp; The Waiver Board</h3>
-        <p>Add the players you want this week to one target list, and see where each is gettable across every league at once. Every claim it builds is fully editable — change the drop from a dropdown, or add your own fallback attempt if your first plan doesn't land. Manage claims you've already submitted right there too, with a true total exposure number against your budget. Free Agent Radar and Mass Drop round it out — surface the best unowned players, or cut a flier from every roster you added them to in one action.</p>
-      </div>
-      <div class="feature-card green-edge">
-        <span class="num">03 — TRADES</span>
-        <h3>Trade Factory</h3>
-        <p>Define a trade and scan every league for valid partners. Review every pending offer across all your leagues in one place — accept, decline, counter, or withdraw without hunting league by league.</p>
-      </div>
-      <div class="feature-card gold-edge">
-        <span class="num">04 — MATCHUPS &amp; POWER RANKINGS</span>
-        <h3>Season Simulation, League by League</h3>
-        <p>See this week's matchup and win probability everywhere at once, then simulate the rest of the season thousands of times for real playoff odds and a positional breakdown against the league. The Player Portfolio adds the gameday pass: every lineup you manage, in kickoff order, showing only the ones that still need a decision.</p>
-      </div>
-    </div>
-    <div style="text-align:center; margin-top:38px;">
-      <a href="features.html" class="btn btn-ghost">See everything it does →</a>
-    </div>
-  </div>
-</section>
-
-<div class="bolt-divider">
-  <svg viewBox="0 0 1200 46" preserveAspectRatio="none"><path d="M0,46 L500,46 L540,6 L580,46 L1200,46 L1200,0 L0,0 Z" fill="#070b16"/></svg>
-</div>
-
-<section id="tour" style="background:var(--bg-deep);">
-  <div class="wrap">
-    <div class="section-head">
-      <span class="kicker">See it running</span>
-      <h2>The actual product. No mockups.</h2>
-      <p>Every screenshot below is the real interface, not a mockup. Most are live runs against real leagues; the positional breakdown uses a sample one so nobody else&rsquo;s team names end up on this page.</p>
-    </div>
-
-    <div class="tour-row">
-      <div class="tour-text">
-        <span class="kicker">Lineup Optimizer</span>
-        <h3>Applies changes you can actually trust</h3>
-        <p>Each swap shows the real points gained or lost — never a fake number from two players simply changing slot labels. If nothing about the lineup's value actually changed, it says so plainly instead of inventing a trade that didn't happen.</p>
-        <ul class="tour-points">
-          <li>Every OUT/IN row nets to real, verified points — no phantom swaps</li>
-          <li>"Slot changes made (no lineup change)" when the reorg has zero impact</li>
-          <li>Bulk-apply every league at once, or open any single one in the full editor first</li>
+    <div class="split">
+      <div>
+        <span class="eyebrow">New in 2.0: Autosub</span>
+        <h2>Ruled out at 3:30.<br>Replaced by 3:31.</h2>
+        <p class="lede">NFL teams announce inactives about 90 minutes before kickoff, which is exactly when you are at a birthday party, on a flight, or asleep before a London game. Autosub watches the leagues you pick during that window. When a starter is ruled out, it puts your best available bench player in his place, in every league he starts in.</p>
+        <ul class="ticks">
+          <li>Picks the replacement from each league's own bench, using that league's scoring</li>
+          <li>Fills empty slots and moves players who are out onto IR to free a bench spot</li>
+          <li>Never touches a player whose game has started, never makes waiver claims, and never pulls anyone off your taxi squad</li>
+          <li>Tells you when a slot could not be fixed, so a zero is never a surprise</li>
         </ul>
       </div>
-      <div class="tour-shot">
-        <div class="shot-frame"><img src="screenshots/optimizer.png" alt="QuickManager Mass Lineup Optimizer showing per-league results, an optimal lineup, and a real point swap with an honest slot-change note" loading="lazy"></div>
+      <div class="frame">
+        <img src="screenshots/autosub-inbox.png" width="2060" height="918" alt="The autosub inbox: Christian McCaffrey, out, replaced by Kenneth Walker III, Blake Corum, Rhamondre Stevenson and Zach Charbonnet in four different leagues." loading="lazy">
       </div>
     </div>
 
-    <div class="tour-row reverse">
-      <div class="tour-text">
-        <span class="kicker">Matchups &amp; Power Rankings</span>
-        <h3>Know where your week actually swings</h3>
-        <p>See this week's matchup and win probability for every league at once, then run a full season simulation to find which leagues are still genuinely in play. A cross-league table ranks every roster by how much attention is actually worth spending on it right now.</p>
-        <ul class="tour-points">
-          <li>Real-time win probability alongside the projected score, every league</li>
-          <li>Simulated playoff odds, sortable by week-swing, fragility, or weakest slot</li>
-          <li>Click any league for the full detail view — see below</li>
-        </ul>
+    <div class="modes">
+      <div class="mode">
+        <span class="tag tag-grey">Log only</span>
+        <h3>Watch it first</h3>
+        <p>It checks your leagues and writes down what it would have done, without changing anything. A good way to spend your first Sunday with it.</p>
       </div>
-      <div class="tour-shot">
-        <div class="shot-frame"><img src="screenshots/matchups-tab.png" alt="QuickManager Weekly Matchups with win probability, and the Power Rankings cross-league triage table ranked by week swing" loading="lazy"></div>
+      <div class="mode">
+        <span class="tag tag-blue">Approval</span>
+        <h3>You say yes</h3>
+        <p>It lines up each change and waits for you. Set a timer and it goes ahead on its own if you have not answered in time.</p>
       </div>
-    </div>
-
-    <div class="tour-row">
-      <div class="tour-text">
-        <span class="kicker">Power Rankings — Detail View</span>
-        <h3>Not just odds — the whole shape of your season</h3>
-        <p>A fan chart of every simulated path shows exactly when your season's outcomes actually separate, with the real playoff cut line drawn in from the simulation itself. A positional table ranks your team against the rest of the league at every position, so you know precisely what to go fix.</p>
-        <ul class="tour-points">
-          <li>Thousands of simulated seasons, condensed into percentile bands and a median path</li>
-          <li>Toggle between your optimal lineup and a depth/injury-adjusted model</li>
-          <li>Position-by-position rank against the whole league, not just a total score</li>
-        </ul>
-        <div class="demo-callout">
-          <p><strong>Any run saves to a single file you can keep.</strong> One click writes the whole thing &mdash; charts, tables and the positional breakdown &mdash; to one self-contained HTML page that still works offline, with nothing to install to open it. Send it to a leaguemate, keep it as a record of where week 10 stood, or open it next season.</p>
-          <a href="demo.html" class="btn btn-ghost">Open a saved run &rarr;</a>
-          <span class="demo-note">Real export, invented leagues &mdash; nobody else&rsquo;s team names.</span>
-        </div>
-      </div>
-      <div class="tour-shot">
-        <div class="shot-frame"><img src="screenshots/sim-detail.png" alt="QuickManager Power Rankings detail view with a win-total histogram, a fan chart of simulated season paths, and a positional production table" loading="lazy"></div>
+      <div class="mode">
+        <span class="tag tag-red">Away Mode</span>
+        <h3>It just handles it</h3>
+        <p>It makes the change and tells you afterwards. Every move lands in an inbox, grouped so one injury across four leagues reads as one line.</p>
       </div>
     </div>
 
-    <div class="tour-row reverse">
-      <div class="tour-text">
-        <span class="kicker">Player Portfolio</span>
-        <h3>Every player you own, across every league, at once</h3>
-        <p>See your real cross-league exposure to any one player — who you're most riding on, and which of those leagues are actually still live. Age context flags players entering, past, or well beyond their typical prime, without ever predicting what they'll do next.</p>
-        <ul class="tour-points">
-          <li>One list, every league — filterable by league type or position</li>
-          <li>Exposure percentage per player, with a live-league count next to it</li>
-          <li>Age-window flags (ascending, prime, past-prime, age risk) as context, never a forecast</li>
-        </ul>
+    <div class="split flip" style="margin-top: 90px;">
+      <div>
+        <h3 style="font-size: 1.5rem;">Set it up once</h3>
+        <p class="lede" style="margin-top: 14px;">Tick the leagues you want covered, choose a mode, and decide whether it should clear IR too. A checklist shows when everything is ready.</p>
+        <div class="callout"><strong>Keep the tab open.</strong> Autosub runs inside QuickManager on your computer, so it only works while that tab is open, and phones are not supported. If it was not running when a game kicked off, it tells you the next time you open it. Autosub is part of Pro.</div>
       </div>
-      <div class="tour-shot">
-        <div class="shot-frame"><img src="screenshots/portfolio.png" alt="QuickManager Player Portfolio showing cross-league exposure percentages and age context for every rostered player" loading="lazy"></div>
-      </div>
-    </div>
-
-    <div class="tour-row">
-      <div class="tour-text">
-        <span class="kicker">Player Portfolio — Gameday</span>
-        <h3>Every lineup you manage, in kickoff order</h3>
-        <p>Sunday morning, a dozen teams, not much time. This finds the two or three lineups that actually need a click and stays quiet about the rest — an upgrade worth making, a starter who's been ruled out, an empty slot — then writes the change back to Sleeper without leaving the page.</p>
-        <ul class="tour-points">
-          <li>Ordered by kickoff, because that's the deadline — anything already locked is marked, never offered</li>
-          <li>Every suggestion names both sides: who comes in, who goes out, and what the swap is worth</li>
-          <li>Tick the ones you agree with and apply them across every league at once</li>
-        </ul>
-      </div>
-      <div class="tour-shot">
-        <div class="shot-frame"><img src="screenshots/GameDay_Portfolio.png" alt="QuickManager Gameday board listing cross-league lineup swaps in kickoff order, each naming the player coming in, the player going out, and the projected points gained" loading="lazy"></div>
-      </div>
-    </div>
-
-    <div class="tour-row reverse">
-      <div class="tour-text">
-        <span class="kicker">Waiver Wire &amp; Free Agent Radar</span>
-        <h3>Find the add, build the claim, in one screen</h3>
-        <p>Free Agent Radar scans the whole player pool for standouts — filter by position or NFL team, include already-rostered players to scout trade targets, and add anyone straight to the Waiver Board. Manage every pending claim across every league without hunting league by league.</p>
-        <ul class="tour-points">
-          <li>Position and team filters, plus an "include rostered" toggle for trade scouting</li>
-          <li>One-click add to the Waiver Board, single or in bulk</li>
-          <li>Mass Drop and pending-claim management for every league, in one place</li>
-        </ul>
-      </div>
-      <div class="tour-shot">
-        <div class="shot-frame"><img src="screenshots/waiver-tab.png" alt="QuickManager Waiver Wire tab with pending waivers, the Waiver Board, Mass Drop, and Free Agent Radar with position and team filters" loading="lazy"></div>
-      </div>
-    </div>
-
-    <div class="tour-row">
-      <div class="tour-text">
-        <span class="kicker">Trade Factory</span>
-        <h3>Deterministic Trade Impact</h3>
-        <p>Before pulling the trigger on a trade, run a two-sided Monte Carlo simulation. QuickManager isolates exactly how a trade impacts both teams' playoff odds, and its optional depth-injury model reveals the hidden fragility in trading a star for scrubs.</p>
-        <ul class="tour-points">
-          <li>Isolates the exact playoff odds impact using 2,000 parallel realities</li>
-          <li>Depth-injury model simulates random injuries across both sides of the trade</li>
-          <li>Works flawlessly for blockbusters involving both players and draft picks</li>
-        </ul>
-      </div>
-      <div class="tour-shot">
-        <div class="shot-frame"><img src="screenshots/trade-simulator.png" alt="QuickManager Trade Impact Simulator showing before and after playoff odds and the roster fragility chart" loading="lazy"></div>
-      </div>
-    </div>
-
-    <div class="tour-row reverse">
-      <div class="tour-text">
-        <span class="kicker">New in 1.6.0</span>
-        <h3>Who is actually good at wide receiver, and on the back of whom</h3>
-        <p>Click any position in a league's simulation and the whole league opens up in that one slot: every manager ranked by what it is projected to produce, with the players carrying it listed beside them. Sort by any column to flip the question around.</p>
-        <ul class="tour-points">
-          <li>The number of players listed matches what your league actually starts &mdash; three in a 3-WR league, not one</li>
-          <li>SUPERFLEX is its own row, never folded into FLEX, so a superflex league reads correctly</li>
-          <li>Points are what each player is projected to earn <em>while filling that slot</em> &mdash; a tight end who keeps winning your flex shows up under FLEX</li>
-        </ul>
-      </div>
-      <div class="tour-shot">
-        <div class="shot-frame"><img src="screenshots/positional-breakdown.png" alt="QuickManager positional breakdown listing every manager in a league ranked by projected wide receiver production, with their top three contributing receivers beside each row" loading="lazy"></div>
+      <div class="frame">
+        <img src="screenshots/autosub-controls.png" width="2060" height="1458" alt="Autosub settings: a checklist with six rosters loaded and six leagues selected, Away Mode chosen, Clear IR switched on, and the list of leagues it manages." loading="lazy">
       </div>
     </div>
   </div>
 </section>
 
-<section id="whats-new-16">
+<section id="scoreboard" class="section tint">
   <div class="wrap">
-    <div class="section-head">
-      <span class="soon-badge"><span class="dot"></span> Shipping now &mdash; v1.6.0</span>
-      <h2>Ready for the season.</h2>
-      <p>A big round of interface work ahead of kickoff &mdash; the screens you'll live in on a Sunday, rebuilt around what you actually do with them.</p>
-    </div>
-
-    <div class="whats-new-grid">
-      <div class="whatsnew-card" style="grid-column: 1 / -1;">
-        <span class="tag">Power Rankings</span>
-        <h3>The Positional Breakdown</h3>
-        <p>Every position in a simulated league is now a link. Open one and you get the entire league ranked by that slot's projected production, each manager sitting next to the players carrying it &mdash; sortable by any column. The number of contributors matches the number of starters your league actually uses, and SUPERFLEX is ranked on its own rather than folded into FLEX, so a superflex league finally reads the way it plays.</p>
+    <div class="split flip">
+      <div>
+        <span class="eyebrow">Live scoreboard</span>
+        <h2>Every matchup, as it happens.</h2>
+        <p class="lede">Live scores and your chance of winning from here, in every league at once. Open a matchup to follow each player's points, projection and stat line while his game is on.</p>
+        <ul class="ticks">
+          <li>Win probability that tightens as games finish</li>
+          <li>Pop it out into its own window and keep it on a second screen</li>
+          <li>Standings for every league, with playoff odds from your last simulation</li>
+          <li>Leagues that also play the league median are counted the way they score</li>
+        </ul>
       </div>
-      <div class="whatsnew-card">
-        <span class="tag">Trade Factory</span>
-        <h3>Trades, Start to Finish</h3>
-        <p>Point the simulator at a specific manager and their roster becomes a selectable list, their draft picks come into play, and you can send the offer without rebuilding it somewhere else &mdash; with a DM attached if you want one. Everything the extension sends now stops at a summary of what's moving each way, so nothing reaches Sleeper you haven't read.</p>
-      </div>
-      <div class="whatsnew-card">
-        <span class="tag">Exports</span>
-        <h3>Take the Numbers With You</h3>
-        <p>Export your starters one row per team, per slot, per contributing player &mdash; as a flat CSV, or as a spreadsheet with each league on its own sheet and the numbers left as numbers so they sort and chart. The saved HTML page carries the positional breakdown with it too.</p>
-      </div>
-      <div class="whatsnew-card">
-        <span class="tag">Everywhere</span>
-        <h3>Say Who You Mean</h3>
-        <p>Teams and managers are named together, in one consistent format, everywhere the extension mentions either &mdash; so you stop having to remember which of your leagues calls that person what. League filters stopped offering options that would return nothing, too.</p>
+      <div class="stack">
+        <div class="frame back"><img src="screenshots/scoreboard-live.png" width="2060" height="1620" alt="The live scoreboard with win probability bars for six matchups." loading="lazy"></div>
+        <div class="frame front"><img src="screenshots/matchup-live.png" width="1880" height="1852" alt="One matchup player by player, with live points, projections and stat lines." loading="lazy"></div>
       </div>
     </div>
   </div>
 </section>
 
-<section id="whats-new" style="background:var(--bg-deep);">
+<section id="features" class="section">
   <div class="wrap">
-    <div class="section-head">
-      <span class="soon-badge"><span class="dot"></span> Also in the build</span>
-      <h2>Seven more things nobody asked us to build twice.</h2>
-      <p>Shipped before 1.6.0, and all still here.</p>
+    <div class="head center">
+      <span class="eyebrow">Everything else</span>
+      <h2>The rest of your week, in one place.</h2>
+      <p class="lede">Managing one league is easy. Managing ten is a chore. Every tool here runs across all of your leagues at once.</p>
+    </div>
+    <div class="grid">
+      <a class="card" href="features.html#lineups">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h10M4 18h6"/><path d="M17 15l3 3-3 3"/></svg></div>
+        <h3>Lineup optimizer</h3>
+        <p>See the points sitting on your bench in every league and set the best lineup everywhere with one click.</p>
+      </a>
+      <a class="card" href="features.html#gameday">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+        <h3>Gameday board</h3>
+        <p>Every lineup you manage in kickoff order, showing only the ones that still need a decision.</p>
+      </a>
+      <a class="card" href="features.html#waivers">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></div>
+        <h3>Waivers</h3>
+        <p>One list of targets, a claim built for every league they are available in, and all of your bids in one place.</p>
+      </a>
+      <a class="card" href="features.html#trades">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h12l-3-3M17 17H5l3 3"/></svg></div>
+        <h3>Trades</h3>
+        <p>Find partners across your leagues, answer every pending offer, and see what a deal does to both teams.</p>
+      </a>
+      <a class="card" href="features.html#season">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg></div>
+        <h3>Power rankings</h3>
+        <p>Thousands of simulated seasons per league for real playoff odds, and how your roster stacks up at every position.</p>
+      </a>
+      <a class="card" href="features.html#rosters">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></div>
+        <h3>Roster health</h3>
+        <p>Every roster checked against its league's IR and taxi rules, with fixes that never cut anyone without asking.</p>
+      </a>
     </div>
 
-    <div class="whats-new-grid">
-      <div class="whatsnew-card" style="grid-column: 1 / -1;">
-        <span class="tag">Player Portfolio</span>
-        <h3>The Gameday Board</h3>
-        <p>Every lineup you manage, ordered by kickoff, showing only what still needs a decision — an upgrade worth making, a starter who's been ruled out, an empty slot. Each suggestion names both players, the slot it touches, and what the swap is actually worth in that league's own scoring. Tick the ones you agree with and apply them across every league at once. Anything already locked is marked as locked and never offered.</p>
+    <div class="split" style="margin-top: 110px;">
+      <div>
+        <span class="eyebrow">Gameday board</span>
+        <h2>Sunday morning, sorted by kickoff.</h2>
+        <p class="lede">The board goes through every lineup you manage and shows only what needs a decision: a starter who is out, a player on a bye, an empty slot, or an upgrade worth making. Each move names both players and what it is worth in that league.</p>
+        <ul class="ticks">
+          <li>Apply one move, or tick the ones you like and apply them all</li>
+          <li>Ignore a suggestion, and it comes back only if the numbers change</li>
+          <li>Players whose games have started are locked and never offered</li>
+        </ul>
       </div>
-      <div class="whatsnew-card">
-        <span class="tag">Trade Factory</span>
-        <h3>Deterministic Trade Impact</h3>
-        <p>Before pulling the trigger on a trade, run a two-sided Monte Carlo simulation. By running 2,000 parallel realities for both teams using a shared seed, it isolates the exact playoff odds change caused purely by the trade itself.</p>
-      </div>
-      <div class="whatsnew-card">
-        <span class="tag">Trade Factory</span>
-        <h3>Roster Fragility Model</h3>
-        <p>A star-for-scrubs trade looks great until a bye week hits. The Trade Simulator now features an optional depth-injury risk model that applies random injuries to both sides of the trade to reveal how it actually impacts your roster's fragility.</p>
-      </div>
-      <div class="whatsnew-card">
-        <span class="tag">Roster Editor</span>
-        <h3>Spy Mode</h3>
-        <p>Look up another manager's roster and situation without pretending you can act on it — the tabs that would let you submit anything are grayed out automatically the moment you're viewing someone else's team.</p>
-      </div>
-      <div class="whatsnew-card">
-        <span class="tag">Waiver Board</span>
-        <h3>An Optional Cap on Total FAAB Spend</h3>
-        <p>Set a ceiling on what a whole board of claims could cost you, across every claim at once. It catches the case where the cap you set is actually lower than your own top single bid, before you submit anything.</p>
-      </div>
-      <div class="whatsnew-card">
-        <span class="tag">Draft Picks</span>
-        <h3>Exact Pick Slots, Not Just "Round 1"</h3>
-        <p>Draft picks now resolve to a real slot — "1.05, 5th overall" — computed from your league's actual draft order, handling snake, linear, and 3rd-round-reversal formats. When a draft's order genuinely isn't set yet, it says so plainly instead of guessing.</p>
-      </div>
-      <div class="whatsnew-card">
-        <span class="tag">Everywhere</span>
-        <h3>Full IDP Support</h3>
-        <p>Defensive players are ranked, optimized, and slotted correctly wherever the extension touches a lineup — DL, LB, and DB starters are treated exactly like every offensive position, using your league's own IDP scoring.</p>
+      <div class="frame">
+        <img src="screenshots/gameday-board.png" width="2060" height="1776" alt="The Gameday board with 10 moves to make across 6 lineups, each showing the player coming in, the player going out, and the points gained." loading="lazy">
       </div>
     </div>
+
+    <div class="split flip" style="margin-top: 110px;">
+      <div>
+        <span class="eyebrow">Season simulation</span>
+        <h2>Know which leagues are still alive.</h2>
+        <p class="lede">Simulate the rest of the season in every league at once. See every way the season could finish, when the outcomes pull apart, and exactly which position is holding your team back.</p>
+        <p class="muted" style="margin-top: 18px;">Every run saves to a single page that works offline. <a href="demo.html">Open a saved run</a> made from invented leagues.</p>
+      </div>
+      <div class="frame">
+        <img src="screenshots/power-rankings.png" width="2680" height="2264" alt="A simulated season for one league: a histogram of final win totals, a fan chart of every simulated path against the playoff cut, and positional production against the league." loading="lazy">
+      </div>
+    </div>
+
+    <div class="more"><a href="features.html" class="btn btn-line">See every feature</a></div>
   </div>
 </section>
 
-<section id="pricing" style="background:var(--bg-deep);">
+<section id="pricing" class="section tint">
   <div class="wrap">
-    <div class="section-head">
-      <span class="kicker">Free vs Pro</span>
+    <div class="head center">
+      <span class="eyebrow">Pricing</span>
       <h2>Try the whole thing first.</h2>
-      <p>Every feature works on the free plan for up to 5 leagues. Upgrade when you're ready to run it everywhere.</p>
+      <p class="lede">The free plan is not a demo. Pro is for when you want it on every league, and autosub watching them.</p>
     </div>
-    <div class="plans-grid">
-      <div class="plan-card">
-        <div class="plan-name">Free</div>
-        <div class="plan-price">$0</div>
-        <ul class="plan-list">
-          <li>Every feature, fully working</li>
-          <li>Applies to up to 5 leagues</li>
-          <li>Unlimited scans and previews</li>
-          <li>No credit card required</li>
+    <div class="plans">
+      <div class="plan">
+        <div class="name">Free</div>
+        <div class="price">$0</div>
+        <p class="muted">For up to five leagues.</p>
+        <ul class="ticks">
+          <li>Lineup optimizer and Gameday board</li>
+          <li>Live scoreboard and standings</li>
+          <li>Waivers, trades and power rankings</li>
+          <li>No card needed</li>
         </ul>
       </div>
-      <div class="plan-card pro">
-        <div class="plan-name">Pro</div>
-        <div class="plan-price">$25<sub>&nbsp;/ year</sub></div>
-        <ul class="plan-list">
-          <li>Everything in Free</li>
-          <li>Applies to every league at once</li>
-          <li>7-day free trial, no card needed to start</li>
-          <li>Cancel anytime from the extension</li>
+      <div class="plan pro">
+        <div class="name">Pro</div>
+        <div class="price">$25 <small>per year</small></div>
+        <p class="muted">For every league you are in.</p>
+        <ul class="ticks">
+          <li>Everything in Free, on all of your leagues</li>
+          <li>Autosub</li>
+          <li>League filters</li>
+          <li>7 days free to start, no card needed</li>
         </ul>
       </div>
     </div>
   </div>
 </section>
 
-<div class="bolt-divider" style="background:var(--bg-deep);">
-  <svg viewBox="0 0 1200 46" preserveAspectRatio="none"><path d="M0,0 L500,0 L540,40 L580,0 L1200,0 L1200,46 L0,46 Z" fill="#0b1120"/></svg>
-</div>
-
-<section id="setup">
+<section id="setup" class="section">
   <div class="wrap">
-    <div class="section-head">
-      <span class="kicker">Setup</span>
-      <h2>Two minutes, then it runs itself.</h2>
-      <p>QuickManager connects to your existing Sleeper session — there's no account to create and no password to give us.</p>
+    <div class="head center">
+      <span class="eyebrow">Setup</span>
+      <h2>Two minutes, then it runs.</h2>
+      <p class="lede">QuickManager uses the Sleeper session you already have. There is no account to create and no password to give anyone.</p>
     </div>
-
-    <h3 style="font-family:'Inter',sans-serif; text-transform:none; font-weight:600; font-size:1.05rem; letter-spacing:0; margin-bottom:6px;">Desktop — Chrome, Edge, Brave, and Firefox</h3>
-    <div class="steps">
-      <div class="step">
-        <div><h4>Install the extension</h4><p>Add QuickManager from the <a href="https://chromewebstore.google.com/detail/quickmanager-fantasy-for/maocponhaeapmbgcjdpofjgfabogjibi?utm_source=qm_website" target="_blank" rel="noopener">Chrome Web Store</a> (Chrome, Edge, Brave) or <a href="https://addons.mozilla.org/en-US/firefox/addon/quickmanager-for-sleeper/?utm_source=qm_website" target="_blank" rel="noopener">Firefox Add-ons</a> (desktop and Android).</p></div>
+    <div class="setup">
+      <div class="card">
+        <h3>On a computer</h3>
+        <p class="muted">Chrome, Edge, Brave and Firefox</p>
+        <ol>
+          <li>Add QuickManager from the <a href="https://chromewebstore.google.com/detail/quickmanager-fantasy-for/maocponhaeapmbgcjdpofjgfabogjibi?utm_source=qm_website" target="_blank" rel="noopener">Chrome Web Store</a> or <a href="https://addons.mozilla.org/en-US/firefox/addon/quickmanager-for-sleeper/?utm_source=qm_website" target="_blank" rel="noopener">Firefox store</a>.</li>
+          <li>Open sleeper.com in any tab and sign in as usual.</li>
+          <li>Click the QuickManager icon. It connects and loads your leagues.</li>
+        </ol>
       </div>
-      <div class="step">
-        <div><h4>Log into Sleeper</h4><p>Open sleeper.com in any tab and sign in as usual.</p></div>
+      <div class="card">
+        <h3>iPhone and iPad</h3>
+        <p class="muted">Through the <a href="https://kagi.com/orion/" target="_blank" rel="noopener">Orion browser</a>, not Safari</p>
+        <ol>
+          <li>Install Orion, then add QuickManager inside it.</li>
+          <li>Open sleeper.com in Orion, sign in, and turn on <code>Request Desktop Website</code> from the page menu.</li>
+          <li>Let the page reload. A floating button turns blue once your session is picked up.</li>
+        </ol>
       </div>
-      <div class="step">
-        <div><h4>Open QuickManager</h4><p>Click the toolbar icon. It connects automatically and pulls in your leagues.</p></div>
-      </div>
-    </div>
-
-    <h3 style="font-family:'Inter',sans-serif; text-transform:none; font-weight:600; font-size:1.05rem; letter-spacing:0; margin:40px 0 6px;">iPhone &amp; iPad — via Orion</h3>
-    <p style="color:var(--muted); font-size:0.93rem; margin-bottom:20px;">On iOS, QuickManager runs inside the <a href="https://kagi.com/orion/" target="_blank" rel="noopener">Orion browser</a> (free, by Kagi) — the only iOS browser that supports Chrome/Firefox-style extensions. Not Safari.</p>
-    <div class="steps">
-      <div class="step">
-        <div><h4>Install Orion, then QuickManager inside it</h4><p>Orion supports Chrome and Firefox-style extensions natively.</p></div>
-      </div>
-      <div class="step">
-        <div><h4>Open sleeper.com in Orion and log in</h4><p>Then turn on <code>Request Desktop Website</code> from the page-settings menu — this is what makes Sleeper generate your login token.</p></div>
-      </div>
-      <div class="step">
-        <div><h4>Let the page fully reload</h4><p>A floating button appears on the Sleeper page and turns blue once your token is captured.</p></div>
-      </div>
-    </div>
-
-    <h3 style="font-family:'Inter',sans-serif; text-transform:none; font-weight:600; font-size:1.05rem; letter-spacing:0; margin:40px 0 6px;">Android — via a Chrome-extension-capable browser</h3>
-    <p style="color:var(--muted); font-size:0.93rem; margin-bottom:20px;">Most Android browsers don't support extensions, but a few Chromium-based ones do. Look for one that explicitly advertises Chrome extension or Chrome Web Store support.</p>
-    <div class="steps">
-      <div class="step">
-        <div><h4>Install a browser that supports Chrome extensions, then QuickManager inside it</h4><p>Search your device's app store for a Chromium-based browser that lists Chrome extension support — most give you direct access to the Chrome Web Store to install QuickManager the same way you would on desktop.</p></div>
-      </div>
-      <div class="step">
-        <div><h4>Open sleeper.com in that browser and log in</h4><p>Sign in as usual. If your token isn't captured automatically, check for a "Request Desktop Site" option in the browser's page menu — turning it on helps Sleeper generate the token correctly.</p></div>
-      </div>
-      <div class="step">
-        <div><h4>Open QuickManager from the toolbar</h4><p>It should connect automatically once your token is captured.</p></div>
+      <div class="card">
+        <h3>Android</h3>
+        <p class="muted">Through a browser that supports Chrome extensions</p>
+        <ol>
+          <li>Install a Chromium browser that lists Chrome extension support, then add QuickManager.</li>
+          <li>Open sleeper.com, sign in, and turn on Request Desktop Site if your session is not picked up.</li>
+          <li>Open QuickManager from the toolbar.</li>
+        </ol>
       </div>
     </div>
-    <div class="callout"><strong>Stuck on mobile?</strong> Tap the floating "Copy Token" button on the Sleeper page, then paste it into QuickManager's "Paste Bearer Token" box. This works even if auto-connect doesn't, on both iOS and Android.</div>
+    <div class="callout" style="max-width: 780px; margin: 26px auto 0;"><strong>Stuck on a phone?</strong> Tap the floating Copy Token button on the Sleeper page, then paste it into QuickManager's Paste Bearer Token box. That works even when connecting automatically does not.</div>
   </div>
 </section>
 
-<div class="bolt-divider">
-  <svg viewBox="0 0 1200 46" preserveAspectRatio="none"><path d="M0,46 L500,46 L540,6 L580,46 L1200,46 L1200,0 L0,0 Z" fill="#070b16"/></svg>
-</div>
-
-<section id="faq" style="background:var(--bg-deep);">
+<section id="faq" class="section tint">
   <div class="wrap">
-    <div class="section-head">
-      <span class="kicker">FAQ</span>
+    <div class="head center">
+      <span class="eyebrow">FAQ</span>
       <h2>Good questions.</h2>
     </div>
-    <div style="max-width:720px;">
-      <div class="faq-item">
-        <h4>Is my Sleeper login safe?</h4>
-        <p>Yes. Your login token is read locally and stored only in your browser — it never leaves your device, and QuickManager has no server that could see it.</p>
-      </div>
-      <div class="faq-item">
-        <h4>Why isn't my lineup change showing up?</h4>
-        <p>Click "Refresh Rosters," then re-run the optimizer. Lineups are set per week, so double-check the Target Week matches the week you edited.</p>
-      </div>
-      <div class="faq-item">
-        <h4>Do you support IDP leagues?</h4>
-        <p>Yes. Defensive players (DL, LB, DB) are ranked and optimized just like everyone else, using Sleeper's IDP projections and your league's own IDP scoring settings.</p>
-      </div>
-      <div class="faq-item">
-        <h4>Is this affiliated with Sleeper?</h4>
-        <p>No. QuickManager is an independent tool built to work with your existing Sleeper account. It isn't affiliated with, endorsed by, or sponsored by Sleeper.</p>
-      </div>
-      <div class="faq-item">
-        <h4>How do I cancel Pro?</h4>
-        <p>Open QuickManager and use the account management link next to your Pro badge — payments are handled by ExtensionPay and Stripe, and you're never charged without a clear renewal notice beforehand.</p>
-      </div>
+    <div class="faq">
+      <details>
+        <summary>Does autosub keep working if I close the tab?</summary>
+        <p>No. Autosub runs inside the QuickManager tab on your computer. If you close the tab, shut the laptop or quit the browser, it stops. The next time you open QuickManager it tells you how long it was not running.</p>
+      </details>
+      <details>
+        <summary>Can autosub mess up my lineup?</summary>
+        <p>Start in Log only and it changes nothing. It just shows you what it would have done. In Approval mode nothing happens until you say so. In Away Mode it acts only on a starter who is ruled out or has no game, or on an empty slot, and only with a player whose game has not started. The optimizer option that lets it chase upgrades is off unless you turn it on.</p>
+      </details>
+      <details>
+        <summary>Does autosub work on my phone?</summary>
+        <p>No. Phone browsers pause tabs in the background, so autosub cannot be trusted there. Use it on a computer that stays on.</p>
+      </details>
+      <details>
+        <summary>Is my Sleeper login safe?</summary>
+        <p>Yes. Your login token is read and stored only in your browser. It never leaves your device, and QuickManager has no server that could see it.</p>
+      </details>
+      <details>
+        <summary>Why isn't my lineup change showing up?</summary>
+        <p>Click Refresh Rosters, then run the optimizer again. Lineups are set per week, so check that the week you picked matches the week you edited.</p>
+      </details>
+      <details>
+        <summary>Do you support IDP leagues?</summary>
+        <p>Yes. Defensive players (DL, LB and DB) are ranked and optimized like everyone else, using Sleeper's IDP projections and your league's own IDP scoring.</p>
+      </details>
+      <details>
+        <summary>Is this affiliated with Sleeper?</summary>
+        <p>No. QuickManager is an independent tool that works with your existing Sleeper account. It is not affiliated with, endorsed by or sponsored by Sleeper.</p>
+      </details>
+      <details>
+        <summary>How do I cancel Pro?</summary>
+        <p>Open QuickManager and use the account link next to your Pro badge. Payments are handled by ExtensionPay and Stripe, and you are never charged without a renewal notice first.</p>
+      </details>
     </div>
   </div>
 </section>
 
-<div class="bolt-divider" style="background:var(--bg-deep);">
-  <svg viewBox="0 0 1200 46" preserveAspectRatio="none"><path d="M0,0 L500,0 L540,40 L580,0 L1200,0 L1200,46 L0,46 Z" fill="#0b1120"/></svg>
-</div>
-
-<section id="privacy">
+<section id="privacy" class="section">
   <div class="wrap">
-    <div class="section-head">
-      <span class="kicker">Privacy Policy</span>
-      <h2>What we do (and don't) collect.</h2>
+    <div class="head center">
+      <span class="eyebrow">Privacy policy</span>
+      <h2>What we do and don't collect.</h2>
     </div>
-    <div class="privacy-block">
-      <p class="updated">Last updated: August 2026</p>
+    <div class="privacy">
+      <p class="updated">Last updated: September 2026</p>
       <p>QuickManager ("the extension") is a browser extension that helps you manage your Sleeper fantasy football leagues.</p>
 
       <h3>Data we access</h3>
       <ul>
-        <li><strong style="color:var(--text)">Your Sleeper authentication token and account ID</strong> — read from your browser so the extension can act within your own logged-in Sleeper session, and so it can confirm the username you enter matches the account you're signed in as. Both are stored only on your device and never transmitted to us or any third party.</li>
-        <li><strong style="color:var(--text)">Your Sleeper league, roster, and player data</strong> — read directly from Sleeper's servers by your browser, used only to display and act on your leagues. It is not collected or stored off-device.
-
-          <div style="margin-top:14px; padding-left:0;">
-            <p style="margin:0 0 8px; font-weight:600; color:var(--text);">What "acting on your leagues" means</p>
-            <p style="margin:0 0 10px;">When you use a feature that changes something, the extension sends that specific request to Sleeper using your own logged-in session — the same as if you'd clicked the button on Sleeper's own site or app. This includes setting lineups, submitting or editing waiver claims, proposing, countering, or modifying trades, moving players to or from IR or the taxi squad, and dropping players. Nothing happens automatically or in the background — every action is one you initiated.</p>
-            <p style="margin:0;"><strong style="color:var(--text);">Sending a message on your behalf.</strong> When you propose or counter a trade, you can optionally check a box to also send the other manager a Sleeper direct message with the trade attached. This only happens if you check that box for that specific trade — it's never sent automatically, and the extension doesn't read, store, or otherwise access your Sleeper messages beyond delivering that one message.</p>
-          </div>
+        <li><strong>Your Sleeper authentication token and account ID.</strong> These are read from your browser so the extension can act within your own logged in Sleeper session, and so it can confirm that the username you enter matches the account you are signed in as. Both are stored only on your device and are never sent to us or to any third party.</li>
+        <li><strong>Your Sleeper league, roster and player data.</strong> This is read directly from Sleeper's servers by your browser and used only to show and act on your leagues. It is not collected or stored anywhere other than your device.
+          <p style="margin-top: 14px;"><strong>What acting on your leagues means.</strong> When you use a feature that changes something, the extension sends that request to Sleeper using your own logged in session, the same as if you had clicked the button on Sleeper's own site or app. This includes setting lineups, submitting or editing waiver claims, proposing, countering or changing trades, moving players to or from IR or the taxi squad, and dropping players. Nothing happens automatically unless you turn on autosub, described below. Every other action is one you start yourself.</p>
+          <p><strong>Autosub.</strong> If you switch autosub on, the extension checks the leagues you choose while QuickManager is open. Depending on the mode you pick, it either records the lineup and IR changes it would make, waits for your approval, or makes those changes in those leagues without a click from you. It uses the same logged in session and the same kind of requests as any other change, and it keeps a record of every change on your device. It can drop a player only if you have marked that player as droppable in advance. Autosub never runs unless you turn it on, and you can turn it off at any time.</p>
+          <p><strong>Sending a message for you.</strong> When you propose or counter a trade, you can tick a box to also send the other manager a Sleeper direct message with the trade attached. This only happens if you tick that box for that trade. It is never sent automatically, and the extension does not read, store or otherwise access your Sleeper messages beyond delivering that one message.</p>
         </li>
-        <li><strong style="color:var(--text)">Preferences and a cached player list</strong> — stored locally on your device so the extension runs quickly.</li>
+        <li><strong>Preferences and a cached player list.</strong> These are stored on your device so the extension runs quickly.</li>
       </ul>
 
       <h3>Data we do not collect</h3>
-      <p>We do not operate a server that receives your data. We do not collect, sell, or share your personal information, browsing history, or Sleeper credentials.</p>
+      <p>We do not run a server that receives your data. We do not collect, sell or share your personal information, browsing history or Sleeper credentials.</p>
 
       <h3>Payments</h3>
       <p>Optional Pro upgrades are processed by <a href="https://extensionpay.com" target="_blank" rel="noopener">ExtensionPay</a> using Stripe. Your email and payment details are handled by ExtensionPay and Stripe under their own privacy policies. The extension only checks whether your account has an active pass.</p>
 
       <h3>Third parties</h3>
-      <p>The extension communicates only with Sleeper (sleeper.com, api.sleeper.app) and, for payment status, ExtensionPay (extensionpay.com).</p>
+      <p>The extension communicates only with Sleeper (sleeper.com and api.sleeper.app) and, for payment status, ExtensionPay (extensionpay.com).</p>
 
       <h3>Affiliation</h3>
-      <p>QuickManager is an independent product and is not affiliated with, endorsed by, or sponsored by Sleeper.</p>
+      <p>QuickManager is an independent product and is not affiliated with, endorsed by or sponsored by Sleeper.</p>
 
       <h3>Contact</h3>
       <p>Questions about this policy or your data: <a href="mailto:quickmanagerfantasy@gmail.com">quickmanagerfantasy@gmail.com</a></p>
@@ -842,29 +361,21 @@
   </div>
 </section>
 
-<footer>
+<footer class="foot">
   <div class="wrap">
-    <div class="footer-grid">
-      <div>
-        <div class="footer-brand">
-          <img src="icons/logo_mark.png" alt="QuickManager">
-          <span>QuickManager</span>
-        </div>
-        <p class="footer-note">Independent tool for Sleeper fantasy football. Not affiliated with, endorsed by, or sponsored by Sleeper.</p>
-      </div>
-      <div class="footer-links">
-        <a href="#features">Features</a>
-        <a href="#tour">Screenshots</a>
-        <a href="features.html">All features</a>
-        <a href="#pricing">Pricing</a>
-        <a href="#setup">Setup</a>
-        <a href="#faq">FAQ</a>
-        <a href="#privacy">Privacy</a>
-        <a href="mailto:quickmanagerfantasy@gmail.com">Contact</a>
-      </div>
+    <a href="#top" class="brand"><img src="icons/logo_mark.png" alt=""><span>Quick<b>Manager</b></span></a>
+    <div class="links">
+      <a href="#autosub">Autosub</a>
+      <a href="features.html">All features</a>
+      <a href="changelog.html">Changelog</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#setup">Setup</a>
+      <a href="#faq">FAQ</a>
+      <a href="#privacy">Privacy</a>
+      <a href="mailto:quickmanagerfantasy@gmail.com">Contact</a>
     </div>
-    <div class="footer-bottom">
-      <span>© 2026 QuickManager</span>
+    <div class="fine">
+      <span>© 2026 QuickManager. An independent tool for Sleeper fantasy football, not affiliated with, endorsed by or sponsored by Sleeper.</span>
       <span>quickmanagerfantasy@gmail.com</span>
     </div>
   </div>
