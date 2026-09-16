@@ -17,7 +17,7 @@
 <nav class="nav">
   <div class="wrap">
     <a href="index.html" class="brand"><img src="icons/logo_mark.png" alt=""><span>Quick<b>Manager</b></span></a>
-    <a href="changelog.html" class="ver-pill" data-qm-version title="See what changed in each version">v2.0.0</a>
+    <a href="changelog.html" class="ver-pill" data-qm-version title="See what changed in each version">v2.0.2</a>
     <div class="nav-links">
       <a href="index.html#autosub">Autosub</a>
       <a href="features.html">Features</a>
@@ -41,8 +41,28 @@
   <div class="notepad">
     <div class="bar"><i></i><i></i><i></i><em>changelog.txt</em></div>
     <div class="body">
+      <article class="release" id="v2.0.2">
+        <h2>Version 2.0.2<span class="latest">LATEST</span></h2>
+        <pre>One fix on top of 2.0.1.
+
+<b>FIXED</b>
+The "Move All Eligible to IR" button counted players from the saved player list, which is refreshed once a day, so on the morning after a week ends it was still reading last week's injury designations. The button would offer moves in a dozen leagues and then find nothing when you clicked it, because those players had gone from Out to Questionable overnight. It now checks the players it is about to name before it shows a number.</pre>
+      </article>
+      <article class="release" id="v2.0.1">
+        <h2>Version 2.0.1</h2>
+        <pre>A fix release for the first weeks of the season, mostly about moving to the next week at the right time.
+
+<b>FIXED</b>
+A player left on your IR slot who is no longer IR eligible, because he came off the real NFL injury list or his designation cleared, makes Sleeper reject every lineup change in that league. QuickManager had stopped counting that as a problem, so the Fix Illegal Rosters button never appeared and applying a lineup just failed. It is flagged again, the button repairs it, and autosub names the leagues it cannot manage until you do.
+QuickManager now moves to the next week overnight after Monday's game, when Sleeper updates standings. It used to wait until Sleeper's own app changed weeks, which comes later, so lineups, autosub, the waiver tools and Power Rankings were still working on the week that had just been played. The scoreboard still shows last week's final scores until Sleeper moves on.
+Power Rankings could count the week that just ended twice, once in each team's record and again in the simulation. If you ran it in the days right after a week ended, run it again for corrected playoff odds.
+A dashboard left open, including autosub in Away Mode and the scoreboard in its own window, now notices when a new week starts. Before, it stayed on the week it was opened on until you clicked back into it.
+Refresh Rosters now picks up a new week as well.
+On a phone, Standings squeezed the team names out of view. Names now stay readable and the rest of the table scrolls sideways.
+The Free Agent Radar's Rest of season view was labelled as weeks 1 to 18. It now shows the weeks it actually averages, from this week on.</pre>
+      </article>
       <article class="release" id="v2.0.0">
-        <h2>Version 2.0.0<span class="latest">LATEST</span></h2>
+        <h2>Version 2.0.0</h2>
         <pre>QuickManager 2.0 is the biggest update so far. It adds autosub, a live scoreboard and standings, and a long list of fixes to how injuries and locked games are handled.
 
 <b>NEW: Autosub</b>
