@@ -17,7 +17,7 @@
 <nav class="nav">
   <div class="wrap">
     <a href="index.html" class="brand"><img src="icons/logo_mark.png" alt=""><span>Quick<b>Manager</b></span></a>
-    <a href="changelog.html" class="ver-pill" data-qm-version title="See what changed in each version">v2.0.5</a>
+    <a href="changelog.html" class="ver-pill" data-qm-version title="See what changed in each version">v2.0.6</a>
     <div class="nav-links">
       <a href="index.html#autosub">Autosub</a>
       <a href="features.html">Features</a>
@@ -41,8 +41,20 @@
   <div class="notepad">
     <div class="bar"><i></i><i></i><i></i><em>changelog.txt</em></div>
     <div class="body">
+      <article class="release" id="v2.0.6">
+        <h2>Version 2.0.6<span class="latest">LATEST</span></h2>
+        <pre>Smarter lineup slotting around autosubs, and autosubs that clean up after themselves.
+
+<b>CHANGED</b>
+Optimize now takes back an autosub it gave a Questionable player once that player is cleared to play, as long as neither game has started. Autosubs you picked yourself are left alone.
+
+With Sleeper autosubs set to Overwrite in the Lineup Optimizer, Optimize now also clears autosubs on healthy starters no matter who set them, and swaps a weak autosub for a better one, the same way Optimize in Edit Lineup already did.
+
+<b>FIXED</b>
+With Late games in FLEX on, a starter who had an autosub could get stuck in FLEX even when his game kicked off first, and Optimize put him back there after you moved him. He is now slotted by kickoff like everyone else, in any spot his autosub can still cover.</pre>
+      </article>
       <article class="release" id="v2.0.5">
-        <h2>Version 2.0.5<span class="latest">LATEST</span></h2>
+        <h2>Version 2.0.5</h2>
         <pre>Weekly waiver targets, clickable leagues in the Player Portfolio, and a league view scoring fix.
 
 <b>NEW</b>
